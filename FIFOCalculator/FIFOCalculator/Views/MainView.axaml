@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:FIFOCalculator.ViewModels" 
+             xmlns:views="clr-namespace:FIFOCalculator.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FIFOCalculator.Views.MainView"
+             x:DataType="vm:MainViewModel"
+             x:CompileBindings="True">
+
+	<DockPanel>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="File">
+                <MenuItem Header="New" Command="{Binding New}" />
+                <MenuItem Header="-" />
+                <MenuItem Header="Open" Command="{Binding Open}" />
+                <MenuItem Header="Save" Command="{Binding Save}" />
+            </MenuItem>
+        </Menu>
+        <DockPanel Dock="Bottom">
+			<Border Padding="8" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center">
+				<HeaderedContentControl Header="Simulation">
+					<vm:SimulationView DataContext="{Binding Simulation}"></vm:SimulationView>
+				</HeaderedContentControl>
+			</Border>
+		</DockPanel>
+		<UniformGrid Rows="1">
+			<views:EntryEditorView Margin="10" DataContext="{Binding Inputs}" />
+			<views:EntryEditorView Margin="10" DataContext="{Binding Outputs}" />
+		</UniformGrid>
+	</DockPanel>
+</UserControl>

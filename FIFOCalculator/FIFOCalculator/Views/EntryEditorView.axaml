@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+             x:Class="FIFOCalculator.Views.EntryEditorView"
+             x:DataType="viewModels:EntryEditorViewModel"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             x:CompileBindings="True">
+
+	<UserControl.Resources>
+
+		<ControlTheme x:Key="{x:Type NumericUpDown}" TargetType="NumericUpDown">
+			<Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+			<Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+			<Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+			<Setter Property="MinHeight" Value="{DynamicResource TextControlThemeMinHeight}" />
+			<Setter Property="MinWidth" Value="{DynamicResource TextControlThemeMinWidth}" />
+			<Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+			<Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
+			<Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<ButtonSpinner Name="PART_Spinner"
+								   Background="{TemplateBinding Background}"
+								   BorderThickness="{TemplateBinding BorderThickness}"
+								   BorderBrush="{TemplateBinding BorderBrush}"
+								   CornerRadius="{TemplateBinding CornerRadius}"
+								   Padding="0"
+								   MinWidth="0"
+								   HorizontalContentAlignment="Stretch"
+								   VerticalContentAlignment="Stretch"
+								   AllowSpin="{TemplateBinding AllowSpin}"
+								   Focusable="False"
+								   ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+								   DataValidationErrors.Errors="{TemplateBinding (DataValidationErrors.Errors)}"
+								   ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}">
+						<TextBox Name="PART_TextBox"
+								 Background="Transparent"
+								 BorderBrush="Transparent"
+								 Margin="-1"
+								 Padding="{TemplateBinding Padding}"
+								 MinWidth="0"
+								 Foreground="{TemplateBinding Foreground}"
+								 FontSize="{TemplateBinding FontSize}"
+								 Watermark="{TemplateBinding Watermark}"
+								 IsReadOnly="{TemplateBinding IsReadOnly}"
+								 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+								 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								 Text="{TemplateBinding Text}"
+								 AcceptsReturn="False"
+								 TextWrapping="NoWrap" />
+					</ButtonSpinner>
+				</ControlTemplate>
+			</Setter>
+		</ControlTheme>
+
+	</UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Button.Tool">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Width" Value="36" />
+        </Style>
+    </UserControl.Styles>
+
+	<DockPanel>
+		<TextBlock Text="{Binding Title}" DockPanel.Dock="Top" />
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <DockPanel>
+                <Button Classes="Tool">
+                    <Button.Content>
+						<Svg Path="/Assets/add.svg" />
+                    </Button.Content>
+                    <Button.Flyout>
+                        <Flyout Placement="BottomEdgeAlignedLeft">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <StackPanel.Styles>
+                                        <Style Selector="UniformGrid > :is(Control)">
+                                            <Setter Property="Margin" Value="1 0"></Setter>
+                                        </Style>
+                                    </StackPanel.Styles>
+                                    <TextBox VerticalAlignment="Top" Watermark="Date" Text="{Binding DateText}" />
+                                    <NumericUpDown VerticalAlignment="Top" AllowSpin="False" ShowButtonSpinner="False" Minimum="0" Watermark="Units" DockPanel.Dock="Right" Value="{Binding Units}" />
+                                    <NumericUpDown VerticalAlignment="Top" AllowSpin="False" ShowButtonSpinner="False" Minimum="0" Watermark="Price" DockPanel.Dock="Right"  Value="{Binding PricePerUnit}"  />
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right" Margin="10" DockPanel.Dock="Right" Command="{Binding Add}" Content="Add" />
+                            </StackPanel>
+                            <i:Interaction.Behaviors>
+                                <ia:DataTriggerBehavior Binding="{Binding Add.IsExecuting^}" Value="false">
+                                    <ia:CallMethodAction TargetObject="{Binding $parent[Flyout]}" MethodName="Hide" />
+                                </ia:DataTriggerBehavior>
+                            </i:Interaction.Behaviors>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </DockPanel>
+            <Button Classes="Tool" Command="{Binding DeleteSelected}">
+                <Button.Content>
+                    <Svg Path="/Assets/delete2.svg" />
+                </Button.Content>
+            </Button>
+        </StackPanel>
+		<DataGrid SelectionMode="Single" Items="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
+			<DataGrid.Columns>
+				<DataGridTextColumn CanUserSort="False" Header="Date" Width="*" IsReadOnly="True" x:DataType="viewModels:EntryViewModel" Binding="{Binding When, StringFormat='{}{0:g}'}" />
+				<DataGridTextColumn CanUserSort="False" Header="Units" Width="*" IsReadOnly="True" x:DataType="viewModels:EntryViewModel" Binding="{Binding Units}" />
+				<DataGridTextColumn CanUserSort="False" Header="Price" Width="*" IsReadOnly="True" x:DataType="viewModels:EntryViewModel" Binding="{Binding PricePerUnit, StringFormat='{}{0:C}'}" />
+            </DataGrid.Columns>
+		</DataGrid>
+	</DockPanel>
+</UserControl>
