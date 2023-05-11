@@ -60,57 +60,65 @@
 
 	</UserControl.Resources>
 
-    <UserControl.Styles>
-        <Style Selector="Button.Tool">
-            <Setter Property="Height" Value="36" />
-            <Setter Property="Width" Value="36" />
-        </Style>
-    </UserControl.Styles>
+	<UserControl.Styles>
+		<Style Selector="Button.Tool">
+			<Setter Property="Height" Value="36" />
+			<Setter Property="Width" Value="36" />
+		</Style>
+	</UserControl.Styles>
 
-	<DockPanel>
-		<TextBlock Text="{Binding Title}" DockPanel.Dock="Top" />
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <DockPanel>
-                <Button Classes="Tool">
-                    <Button.Content>
-						<Svg Path="/Assets/add.svg" />
-                    </Button.Content>
-                    <Button.Flyout>
-                        <Flyout Placement="BottomEdgeAlignedLeft">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <StackPanel.Styles>
-                                        <Style Selector="UniformGrid > :is(Control)">
-                                            <Setter Property="Margin" Value="1 0"></Setter>
-                                        </Style>
-                                    </StackPanel.Styles>
-                                    <TextBox VerticalAlignment="Top" Watermark="Date" Text="{Binding DateText}" />
-                                    <NumericUpDown VerticalAlignment="Top" AllowSpin="False" ShowButtonSpinner="False" Minimum="0" Watermark="Units" DockPanel.Dock="Right" Value="{Binding Units}" />
-                                    <NumericUpDown VerticalAlignment="Top" AllowSpin="False" ShowButtonSpinner="False" Minimum="0" Watermark="Price" DockPanel.Dock="Right"  Value="{Binding PricePerUnit}"  />
-                                </StackPanel>
-                                <Button HorizontalAlignment="Right" Margin="10" DockPanel.Dock="Right" Command="{Binding Add}" Content="Add" />
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <Button DockPanel.Dock="Left" Classes="Tool">
+                <Button.Content>
+                    <Svg Path="/Assets/add.svg" />
+                </Button.Content>
+                <Button.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedLeft">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <StackPanel.Styles>
+                                    <Style Selector="UniformGrid > :is(Control)">
+                                        <Setter Property="Margin" Value="1 0"></Setter>
+                                    </Style>
+                                </StackPanel.Styles>
+                                <TextBox VerticalAlignment="Top" Watermark="Date" Text="{Binding DateText}" />
+                                <NumericUpDown VerticalAlignment="Top" AllowSpin="False"
+                                               ShowButtonSpinner="False" Minimum="0" Watermark="Units"
+                                               DockPanel.Dock="Right" Value="{Binding Units}" />
+                                <NumericUpDown VerticalAlignment="Top" AllowSpin="False"
+                                               ShowButtonSpinner="False" Minimum="0" Watermark="Price"
+                                               DockPanel.Dock="Right" Value="{Binding PricePerUnit}" />
                             </StackPanel>
-                            <i:Interaction.Behaviors>
-                                <ia:DataTriggerBehavior Binding="{Binding Add.IsExecuting^}" Value="false">
-                                    <ia:CallMethodAction TargetObject="{Binding $parent[Flyout]}" MethodName="Hide" />
-                                </ia:DataTriggerBehavior>
-                            </i:Interaction.Behaviors>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-            </DockPanel>
-            <Button Classes="Tool" Command="{Binding DeleteSelected}">
+                            <Button HorizontalAlignment="Right" Margin="10" DockPanel.Dock="Right"
+                                    Command="{Binding Add}" Content="Add" />
+                        </StackPanel>
+                        <i:Interaction.Behaviors>
+                            <ia:DataTriggerBehavior Binding="{Binding Add.IsExecuting^}" Value="false">
+                                <ia:CallMethodAction TargetObject="{Binding $parent[Flyout]}" MethodName="Hide" />
+                            </ia:DataTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <Button DockPanel.Dock="Right" Classes="Tool" Command="{Binding DeleteSelected}">
                 <Button.Content>
                     <Svg Path="/Assets/delete2.svg" />
                 </Button.Content>
             </Button>
-        </StackPanel>
-		<DataGrid SelectionMode="Single" Items="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
-			<DataGrid.Columns>
-				<DataGridTextColumn CanUserSort="False" Header="Date" Width="*" IsReadOnly="True" x:DataType="viewModels:EntryViewModel" Binding="{Binding When, StringFormat='{}{0:g}'}" />
-				<DataGridTextColumn CanUserSort="False" Header="Units" Width="*" IsReadOnly="True" x:DataType="viewModels:EntryViewModel" Binding="{Binding Units}" />
-				<DataGridTextColumn CanUserSort="False" Header="Price" Width="*" IsReadOnly="True" x:DataType="viewModels:EntryViewModel" Binding="{Binding PricePerUnit, StringFormat='{}{0:C}'}" />
+            <TextBlock FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding Title}" />
+        </DockPanel>
+        <DataGrid SelectionMode="Single" Items="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserSort="False" Header="Date" Width="*" IsReadOnly="True"
+                                    x:DataType="viewModels:EntryViewModel"
+                                    Binding="{Binding When, StringFormat='{}{0:d}'}" />
+                <DataGridTextColumn CanUserSort="False" Header="Units" Width="*" IsReadOnly="True"
+                                    x:DataType="viewModels:EntryViewModel" Binding="{Binding Units}" />
+                <DataGridTextColumn CanUserSort="False" Header="Price" Width="*" IsReadOnly="True"
+                                    x:DataType="viewModels:EntryViewModel"
+                                    Binding="{Binding PricePerUnit, StringFormat='{}{0:C}'}" />
             </DataGrid.Columns>
-		</DataGrid>
-	</DockPanel>
+        </DataGrid>
+    </DockPanel>
 </UserControl>

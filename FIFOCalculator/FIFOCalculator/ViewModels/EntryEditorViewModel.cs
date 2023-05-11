@@ -38,7 +38,7 @@ public class EntryEditorViewModel : ReactiveValidationObject
 
         Add = ReactiveCommand.Create(() =>
         {
-            source.Add(FromEntry(new Entry(DateTime.Parse(DateText), Units.Value, PricePerUnit.Value)));
+            source.Add(FromEntry(new Entry(DateTime.Parse(DateText!), Units!.Value, PricePerUnit!.Value)));
             DateText = "";
             PricePerUnit = null;
             Units = null;

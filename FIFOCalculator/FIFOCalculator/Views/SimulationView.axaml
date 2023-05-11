@@ -10,15 +10,13 @@
 
 
 
-	<StackPanel>
-		<StackPanel>
-			<HeaderedContentControl Header="From">
-				<DatePicker SelectedDate="{Binding From}" />
-			</HeaderedContentControl>
-            <HeaderedContentControl Header="To">
-                <DatePicker SelectedDate="{Binding To}" /></HeaderedContentControl>
-		</StackPanel>
-        <TextBlock Margin="8" HorizontalAlignment="Center" Text="{Binding Simulation^, StringFormat='{}{0:C}'}" />
-        <Button Margin="8" HorizontalAlignment="Center" Content="Simulate" Command="{Binding Simulate}" />
+	<StackPanel Spacing="8">
+        <HeaderedContentControl Header="From">
+            <DatePicker SelectedDate="{Binding From}" />
+        </HeaderedContentControl>
+        <HeaderedContentControl Header="To">
+            <DatePicker SelectedDate="{Binding To}" /></HeaderedContentControl>
+        <TextBlock HorizontalAlignment="Center" Text="{Binding Simulation^, StringFormat='{}Balance: {0:C}'}" />
+        <Button HorizontalAlignment="Center" Content="Simulate" Command="{Binding Simulate}" />
     </StackPanel>
 </UserControl>

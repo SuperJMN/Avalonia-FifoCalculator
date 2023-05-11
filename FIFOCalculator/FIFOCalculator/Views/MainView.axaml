@@ -2,32 +2,63 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:FIFOCalculator.ViewModels" 
+             xmlns:vm="clr-namespace:FIFOCalculator.ViewModels"
              xmlns:views="clr-namespace:FIFOCalculator.Views"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="FIFOCalculator.Views.MainView"
              x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
 
+	<UserControl.Styles>
+
+		<Style Selector=":is(ContentControl).Panel">
+			<Setter Property="Margin" Value="10" />
+            <Setter Property="BorderBrush" Value="DarkGray" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+		<Style Selector="HeaderedContentControl.CenteredHeader">
+            <Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate>
+						<Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+							<StackPanel>
+								<ContentPresenter Margin="0 4" HorizontalAlignment="Center"
+                                                  Content="{TemplateBinding Header}" FontWeight="Bold" />
+								<ContentPresenter Content="{TemplateBinding Content}" />
+							</StackPanel>
+						</Border>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="views|EntryEditorView">
+			<Setter Property="Margin" Value="4" />
+			<Setter Property="BorderBrush" Value="Gray" />
+			<Setter Property="BorderThickness" Value="1" />
+		</Style>
+
+	</UserControl.Styles>
+
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="File">
-                <MenuItem Header="New" Command="{Binding New}" />
-                <MenuItem Header="-" />
-                <MenuItem Header="Open" Command="{Binding Open}" />
-                <MenuItem Header="Save" Command="{Binding Save}" />
-            </MenuItem>
-        </Menu>
-        <DockPanel Dock="Bottom">
-			<Border Padding="8" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center">
-				<HeaderedContentControl Header="Simulation">
-					<vm:SimulationView DataContext="{Binding Simulation}"></vm:SimulationView>
-				</HeaderedContentControl>
-			</Border>
-		</DockPanel>
-		<UniformGrid Rows="1">
-			<views:EntryEditorView Margin="10" DataContext="{Binding Inputs}" />
-			<views:EntryEditorView Margin="10" DataContext="{Binding Outputs}" />
-		</UniformGrid>
+				<MenuItem Header="New" Command="{Binding New}" />
+				<MenuItem Header="-" />
+				<MenuItem Header="Open" Command="{Binding Open}" />
+				<MenuItem Header="Save" Command="{Binding Save}" />
+			</MenuItem>
+		</Menu>
+		<Grid ColumnDefinitions="* Auto Auto">
+			<UniformGrid Rows="1">
+				<views:EntryEditorView Classes="Panel" DataContext="{Binding Inputs}" />
+				<views:EntryEditorView Classes="Panel" DataContext="{Binding Outputs}" />
+			</UniformGrid>
+			<GridSplitter Grid.Column="1" Width="4" Background="Gainsboro" />
+            <HeaderedContentControl Grid.Column="2" Classes="Panel CenteredHeader" Header="Simulation">
+                <vm:SimulationView Margin="8" DataContext="{Binding Simulation}" />
+            </HeaderedContentControl>
+        </Grid>
 	</DockPanel>
 </UserControl>
