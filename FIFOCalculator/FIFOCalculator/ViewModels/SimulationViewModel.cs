@@ -30,7 +30,7 @@ public class SimulationViewModel : ViewModelBase, ISimulationViewModel
     [Reactive]
     public DateTimeOffset? To { get; set; }
 
-    public IObservable<decimal> Simulation { get; }
+    public IObservable<Balance> Simulation { get; }
 
-    public ReactiveCommand<Unit, Result<decimal>> Simulate { get; }
+    public ReactiveCommand<Unit, Result<Balance>> Simulate { get; }
 }

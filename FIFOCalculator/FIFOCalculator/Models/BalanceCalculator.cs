@@ -16,7 +16,7 @@ public class BalanceCalculator
         this.logger = logger;
     }
 
-    public Result<decimal> CalculateBalance(IEnumerable<Entry> entries, DateTimeOffset? from = default, DateTimeOffset? to = default)
+    public Result<Balance> CalculateBalance(IEnumerable<Entry> entries, DateTimeOffset? from = default, DateTimeOffset? to = default)
     {
         var balance = new decimal();
 
@@ -39,7 +39,7 @@ public class BalanceCalculator
                 
                 if (result.IsFailure)
                 {
-                    return result;
+                    return Result.Failure<Balance>($"Couldn't calculate balance {result.Error}");
                 }
 
                 balance += result.Value;
@@ -59,6 +59,6 @@ public class BalanceCalculator
 
         logger.Execute(x => x.Information("Balance total {Balance:C}", balance));
 
-        return balance;
+        return new Balance(balance, store.Value);
     }
 }

@@ -53,7 +53,7 @@ public class BalanceCalculatorTests
         var enumerable = inputs.Concat(outputs);
         var result = sut.CalculateBalance(enumerable);
         
-        result.Should().SucceedWith(0);
+        result.Should().SucceedWith(new Balance(0, 1));
     }
 
     [Fact]

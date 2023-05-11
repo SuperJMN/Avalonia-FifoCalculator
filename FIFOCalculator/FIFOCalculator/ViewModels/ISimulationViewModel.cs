@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using CSharpFunctionalExtensions;
+using FIFOCalculator.Models;
 using ReactiveUI;
 
 namespace FIFOCalculator.ViewModels;
@@ -9,6 +10,6 @@ public interface ISimulationViewModel
 {
     DateTimeOffset? From { get; set; }
     DateTimeOffset? To { get; set; }
-    IObservable<decimal> Simulation { get; }
-    ReactiveCommand<Unit, Result<decimal>> Simulate { get; }
+    IObservable<Balance> Simulation { get; }
+    ReactiveCommand<Unit, Result<Balance>> Simulate { get; }
 }
