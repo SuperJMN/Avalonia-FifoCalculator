@@ -102,9 +102,11 @@ class Build : NukeBuild
             var repositoryInfo = GetGitHubRepositoryInfo(Repository);
 
             Log.Debug("Commit for the release: {GitVersionSha}", GitVersion.Sha);
+
+            var paths = ZipFiles.GlobFiles("*.zip").Select(path => (string)path).ToArray();
             
             await PublishRelease(x => x
-                .SetArtifactPaths(new string[]{ PublishDirectory })
+                .SetArtifactPaths(paths)
                 .SetCommitSha(GitVersion.Sha)
                 .SetRepositoryName(repositoryInfo.repositoryName)
                 .SetRepositoryOwner(repositoryInfo.gitHubOwner)
