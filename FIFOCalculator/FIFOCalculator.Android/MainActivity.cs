@@ -4,7 +4,8 @@ using Avalonia.Android;
 
 namespace FIFOCalculator.Android
 {
-    [Activity(Label = "FIFOCalculator.Android", Theme = "@style/MyTheme.NoActionBar", Icon = "@drawable/icon", LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
+    [Activity(Label = "SeaweedFS.Gui.Android", Theme = "@style/MyTheme.NoActionBar", Icon = "@drawable/icon",
+        LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
     public class MainActivity : AvaloniaMainActivity
     {
     }
