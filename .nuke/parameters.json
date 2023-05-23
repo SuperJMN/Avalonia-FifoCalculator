@@ -1,0 +1,5 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "FIFOCalculator.sln",
+  "GitHubAuthenticationToken": "v1:CdeVy1i1dEmrZZPbx4MIF/P64I0tMol7hzo3+Nt8T4tNt/eEdPZx6JmxvRCcVar+"
+}
