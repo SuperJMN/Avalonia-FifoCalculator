@@ -7,6 +7,7 @@ using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using ReactiveUI;
 using Zafiro.Avalonia;
+using Zafiro.Avalonia.Interfaces;
 using Zafiro.Core.Mixins;
 using Zafiro.FileSystem;
 

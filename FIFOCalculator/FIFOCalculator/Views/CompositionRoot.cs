@@ -1,7 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using FIFOCalculator.ViewModels;
-using Zafiro.Avalonia;
+using Zafiro.Avalonia.Notifications;
+using Zafiro.Avalonia.Storage;
 
 namespace FIFOCalculator.Views;
 
