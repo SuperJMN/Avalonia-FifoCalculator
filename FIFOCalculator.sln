@@ -9,12 +9,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FIFOCalculator.Android", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FIFOCalculator.Desktop", "src\FIFOCalculator.Desktop\FIFOCalculator.Desktop.csproj", "{9CDE746F-CA21-42CE-94A4-F4610F5F53F0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{B26C9958-7C49-4600-9464-80B1138F931E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B26C9958-7C49-4600-9464-80B1138F931E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B26C9958-7C49-4600-9464-80B1138F931E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6802C65E-25DC-4971-A36D-7188BA3533BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6802C65E-25DC-4971-A36D-7188BA3533BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6802C65E-25DC-4971-A36D-7188BA3533BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
