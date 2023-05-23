@@ -11,13 +11,7 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
-  
-  <ItemGroup>
-    <None Remove="Assets\add.svg" />
-    <None Remove="Assets\delete.svg" />
-  </ItemGroup>
-
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Svg" Version="11.0.0-preview6" />
@@ -39,9 +33,4 @@
     <PackageReference Include="Zafiro.Core" Version="3.2.33" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Views\EntryEditorView.axaml.cs">
-      <DependentUpon>EntryEditorView.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
 </Project>
