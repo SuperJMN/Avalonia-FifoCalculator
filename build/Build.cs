@@ -1,41 +1,25 @@
-using System;
 using System.Linq;
 using Nuke.Common;
-using Nuke.Common.CI;
-using Nuke.Common.Execution;
+using Nuke.Common.CI.AzurePipelines;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
-using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.GitHub;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 using Nuke.GitHub;
-using Octokit;
 using Serilog;
-using static Nuke.Common.EnvironmentInfo;
-using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.GitHub.GitHubTasks;
-using static Nuke.GitHub.ChangeLogExtensions;
-using static Nuke.Common.ChangeLog.ChangelogTasks;
 
-
+[AzurePipelines(AzurePipelinesImage.WindowsLatest, ImportSecrets = new[]{ nameof(GitHubAuthenticationToken)})]
 class Build : NukeBuild
 {
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
-
-    public static int Main() => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Publish);
 
     public AbsolutePath OutputDirectory = RootDirectory / "output";
-    public AbsolutePath PublishDirectory => OutputDirectory / "artifacts" / "publish";
-    public AbsolutePath ZipFiles => OutputDirectory / "artifacts" / "zip";
+    public AbsolutePath PublishDirectory => OutputDirectory / "publish";
+    public AbsolutePath PackagesDirectory => OutputDirectory / "packages";
 
     [Parameter("authtoken")] [Secret] readonly string GitHubAuthenticationToken;
     
@@ -43,7 +27,7 @@ class Build : NukeBuild
     
     [GitVersion] readonly GitVersion GitVersion;
 
-    [Solution] public Solution Solution { get; set; }
+    [Parameter] public string Project { get; set; }
 
     [Parameter("publish-framework")] public string PublishFramework { get; set; }
 
@@ -52,58 +36,60 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")] readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     Target Clean => _ => _
-        .Before(Restore)
         .Executes(() =>
         {
             OutputDirectory.CreateOrCleanDirectory();
             OutputDirectory.GlobDirectories("/**/bin/*", "/**/obj/*").DeleteDirectories();
         });
 
-    Target Restore => _ => _
-        .DependsOn(Clean)
-        .Executes(() =>
-        {
-            DotNetRestore(s => s
-                .SetProjectFile(Solution));
-        });
-
-    Target Compile => _ => _
-        .DependsOn(Restore)
-        .Executes(() =>
-        {
-            DotNetBuild(s => s
-                .SetProjectFile(Solution)
-                .SetConfiguration(Configuration)
-                .EnableNoRestore());
-        });
-
     Target Publish => _ => _
-        .DependsOn(Restore)
+        .DependsOn(Clean)
+        .Requires(() => Project)
         .Executes(() =>
         {
-            DotNetPublish(x => x
-                .SetProject(Solution)
-                .SetFramework(PublishFramework)
-                .SetRuntime(PublishRuntime)
-                .SetOutput(PublishDirectory)
-            );
+            var publishCombinations =
+                from project in new[] { Project, }
+                from framework in new[]{ "net7.0" }
+                from runtime in new[] { "win-x64", "linux-x64" }
+                select new { project, framework, runtime };
 
-            PublishDirectory.ZipTo(ZipFiles / "zipped.zip");
+            DotNetPublish(_ => _
+                .SetConfiguration(Configuration)
+                .CombineWith(publishCombinations, (_, v) => _
+                    .SetProject(v.project)
+                    .SetFramework(v.framework)
+                    .SetRuntime(v.runtime)
+                    .EnableSelfContained()
+                    .SetOutput(PublishDirectory / v.runtime )));
+        });
+
+    Target Zip => _ => _
+        .DependsOn(Publish)
+        .Executes(() =>
+        {
+            PublishDirectory.GetDirectories()
+                .ForEach(path =>
+                {
+                    var zipFileName = path.Name + ".zip";
+                    Log.Information("Compressing {Path} to {File}", path, zipFileName );
+                    path.ZipTo(PackagesDirectory / zipFileName);
+                });
         });
 
     Target PublishGitHubRelease => _ => _
-        .DependsOn(Publish)
+        .DependsOn(Zip)
         .OnlyWhenStatic(() => GitVersion.BranchName.Equals("master") || GitVersion.BranchName.Equals("origin/master"))
         .Requires(() => GitHubAuthenticationToken)
         .Executes(async () =>
         {
             var releaseTag = $"v{GitVersion.MajorMinorPatch}";
-
+    
             var repositoryInfo = GetGitHubRepositoryInfo(Repository);
-
-            Log.Debug("Commit for the release: {GitVersionSha}", GitVersion.Sha);
-
-            var paths = ZipFiles.GlobFiles("*.zip").Select(path => (string)path).ToArray();
+    
+            Log.Information("Commit for the release: {GitVersionSha}", GitVersion.Sha);
+    
+            var paths = PackagesDirectory.GlobFiles("*.zip").Select(path => (string)path).ToArray();
+            Assert.NotEmpty(paths, "Found no packages to upload to the release");
             
             await PublishRelease(x => x
                 .SetArtifactPaths(paths)

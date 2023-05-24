@@ -67,6 +67,9 @@
             "type": "string"
           }
         },
+        "Project": {
+          "type": "string"
+        },
         "PublishFramework": {
           "type": "string",
           "description": "publish-framework"
@@ -86,16 +89,11 @@
             "type": "string",
             "enum": [
               "Clean",
-              "Compile",
               "Publish",
               "PublishGitHubRelease",
-              "Restore"
+              "Zip"
             ]
           }
-        },
-        "Solution": {
-          "type": "string",
-          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
@@ -104,10 +102,9 @@
             "type": "string",
             "enum": [
               "Clean",
-              "Compile",
               "Publish",
               "PublishGitHubRelease",
-              "Restore"
+              "Zip"
             ]
           }
         },
