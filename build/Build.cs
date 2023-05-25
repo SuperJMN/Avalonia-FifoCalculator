@@ -3,16 +3,18 @@ using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
+using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using static Nuke.Common.Tooling.ProcessTasks;
 using Nuke.Common.Utilities.Collections;
 using Nuke.GitHub;
 using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.GitHub.GitHubTasks;
 
-[AzurePipelines(AzurePipelinesImage.WindowsLatest, ImportSecrets = new[]{ nameof(GitHubAuthenticationToken)})]
+[AzurePipelines(AzurePipelinesImage.WindowsLatest, ImportSecrets = new[]{ nameof(GitHubAuthenticationToken)}, AutoGenerate = false)]
 class Build : NukeBuild
 {
     public static int Main() => Execute<Build>(x => x.Publish);
@@ -27,7 +29,7 @@ class Build : NukeBuild
     
     [GitVersion] readonly GitVersion GitVersion;
 
-    [Parameter] public string Project { get; set; }
+    [Solution] Solution Solution;
 
     [Parameter("publish-framework")] public string PublishFramework { get; set; }
 
@@ -39,60 +41,79 @@ class Build : NukeBuild
         .Executes(() =>
         {
             OutputDirectory.CreateOrCleanDirectory();
-            OutputDirectory.GlobDirectories("/**/bin/*", "/**/obj/*").DeleteDirectories();
+            var absolutePaths = RootDirectory.GlobDirectories("**/bin", "**/obj").Where(a => !((string)a).Contains("build")).ToList();
+            Log.Information("Deleting {Dirs}", absolutePaths);
+            absolutePaths.DeleteDirectories();
         });
 
     Target Publish => _ => _
+        .DependsOn(PublishAndroid)
+        .DependsOn(PublishDesktop);
+
+    Target RestoreWorkloads => _ => _
+        .Executes(() =>
+        {
+            StartShell($"dotnet workload restore {Solution.Path}").AssertZeroExitCode();
+        });
+
+    Target PublishDesktop => _ => _
         .DependsOn(Clean)
-        .Requires(() => Project)
+        .DependsOn(RestoreWorkloads)
         .Executes(() =>
+    {
+        var desktopProject = Solution.AllProjects.First(project => project.Name.EndsWith("Desktop"));
+        var runtimes = new[] { "win-x64", "linux-x64", "linux-arm64" };
+
+        DotNetPublish(settings => settings
+            .SetConfiguration(Configuration)
+            .SetProject(desktopProject)
+            .CombineWith(runtimes, (c, runtime) =>
+                c.SetRuntime(runtime)
+                    .SetOutput(PublishDirectory / runtime)));
+            
+        runtimes.ForEach(rt =>
         {
-            var publishCombinations =
-                from project in new[] { Project, }
-                from framework in new[]{ "net7.0" }
-                from runtime in new[] { "win-x64", "linux-x64" }
-                select new { project, framework, runtime };
-
-            DotNetPublish(_ => _
-                .SetConfiguration(Configuration)
-                .CombineWith(publishCombinations, (_, v) => _
-                    .SetProject(v.project)
-                    .SetFramework(v.framework)
-                    .SetRuntime(v.runtime)
-                    .EnableSelfContained()
-                    .SetOutput(PublishDirectory / v.runtime )));
+            var src = PublishDirectory / rt;
+            var dest = PackagesDirectory / rt + ".zip";
+            Log.Information("Zipping {Input} to {Output}", src, dest);
+            src.ZipTo(dest);
         });
+    });
 
-    Target Zip => _ => _
-        .DependsOn(Publish)
+    Target PublishAndroid => _ => _
+        .DependsOn(Clean)
+        .DependsOn(RestoreWorkloads)
         .Executes(() =>
-        {
-            PublishDirectory.GetDirectories()
-                .ForEach(path =>
-                {
-                    var zipFileName = path.Name + ".zip";
-                    Log.Information("Compressing {Path} to {File}", path, zipFileName );
-                    path.ZipTo(PackagesDirectory / zipFileName);
-                });
-        });
+    {
+        var desktopProject = Solution.AllProjects.First(project => project.Name.EndsWith("Android"));
+
+        DotNetPublish(settings => settings
+            .SetConfiguration(Configuration)
+            .SetProject(desktopProject)
+            .SetOutput(PackagesDirectory));
+    });
 
     Target PublishGitHubRelease => _ => _
-        .DependsOn(Zip)
         .OnlyWhenStatic(() => GitVersion.BranchName.Equals("master") || GitVersion.BranchName.Equals("origin/master"))
+        .DependsOn(Publish)
         .Requires(() => GitHubAuthenticationToken)
         .Executes(async () =>
         {
             var releaseTag = $"v{GitVersion.MajorMinorPatch}";
-    
+
             var repositoryInfo = GetGitHubRepositoryInfo(Repository);
-    
+
             Log.Information("Commit for the release: {GitVersionSha}", GitVersion.Sha);
-    
-            var paths = PackagesDirectory.GlobFiles("*.zip").Select(path => (string)path).ToArray();
-            Assert.NotEmpty(paths, "Found no packages to upload to the release");
-            
+
+            Log.Information("Getting list of files in {Path}", PackagesDirectory);
+            var artifacts = PackagesDirectory.GetFiles().ToList();
+            Log.Information("List of files obtained successfully");
+
+            Assert.NotEmpty(artifacts,
+                "Could not find any package to upload to the release");
+
             await PublishRelease(x => x
-                .SetArtifactPaths(paths)
+                .SetArtifactPaths(artifacts.Select(path => (string)path).ToArray())
                 .SetCommitSha(GitVersion.Sha)
                 .SetRepositoryName(repositoryInfo.repositoryName)
                 .SetRepositoryOwner(repositoryInfo.gitHubOwner)

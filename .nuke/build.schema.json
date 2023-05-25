@@ -67,9 +67,6 @@
             "type": "string"
           }
         },
-        "Project": {
-          "type": "string"
-        },
         "PublishFramework": {
           "type": "string",
           "description": "publish-framework"
@@ -90,10 +87,16 @@
             "enum": [
               "Clean",
               "Publish",
+              "PublishAndroid",
+              "PublishDesktop",
               "PublishGitHubRelease",
-              "Zip"
+              "RestoreWorkloads"
             ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
@@ -103,8 +106,10 @@
             "enum": [
               "Clean",
               "Publish",
+              "PublishAndroid",
+              "PublishDesktop",
               "PublishGitHubRelease",
-              "Zip"
+              "RestoreWorkloads"
             ]
           }
         },
