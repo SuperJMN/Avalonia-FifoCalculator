@@ -72,7 +72,6 @@
         <DockPanel DockPanel.Dock="Top">
             <Button DockPanel.Dock="Left" Classes="Tool">
                 <Button.Content>
-                    <svg:Svg Path="/Assets/add.svg" />
                 </Button.Content>
                 <Button.Flyout>
                     <Flyout Placement="BottomEdgeAlignedLeft">
@@ -104,12 +103,11 @@
             </Button>
             <Button DockPanel.Dock="Right" Classes="Tool" Command="{Binding DeleteSelected}">
                 <Button.Content>
-                    <svg:Svg Path="/Assets/delete2.svg" />
                 </Button.Content>
             </Button>
             <TextBlock FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding Title}" />
         </DockPanel>
-        <DataGrid SelectionMode="Single" Items="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
+        <DataGrid SelectionMode="Single" ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
             <DataGrid.Columns>
                 <DataGridTextColumn CanUserSort="False" Header="Date" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel"
