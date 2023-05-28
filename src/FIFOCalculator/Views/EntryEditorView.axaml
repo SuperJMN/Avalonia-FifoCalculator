@@ -111,12 +111,12 @@
             <DataGrid.Columns>
                 <DataGridTextColumn CanUserSort="False" Header="Date" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel"
-                                    Binding="{Binding When, StringFormat='{}{0:d}'}" />
+                                    Binding="{Binding When, Mode=OneWay, StringFormat='{}{0:d}'}" />
                 <DataGridTextColumn CanUserSort="False" Header="Units" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel" Binding="{Binding Units}" />
                 <DataGridTextColumn CanUserSort="False" Header="Price" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel"
-                                    Binding="{Binding PricePerUnit, StringFormat='{}{0:C}'}" />
+                                    Binding="{Binding PricePerUnit, Mode=OneWay, StringFormat='{}{0:C}'}" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
