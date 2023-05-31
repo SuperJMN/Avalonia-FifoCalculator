@@ -14,12 +14,6 @@
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 
-        <Style Selector=":is(ContentControl).Panel">
-            <Setter Property="Margin" Value="10" />
-            <Setter Property="BorderBrush" Value="DarkGray" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-
         <Style Selector="HeaderedContentControl.CenteredHeader">
             <Setter Property="Template">
                 <Setter.Value>
@@ -34,12 +28,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style Selector="views|EntryEditorView">
-            <Setter Property="Margin" Value="4" />
-            <Setter Property="BorderBrush" Value="Gray" />
-            <Setter Property="BorderThickness" Value="1" />
         </Style>
 
         <Style Selector="HeaderedContentControl">

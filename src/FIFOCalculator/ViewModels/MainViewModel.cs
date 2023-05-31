@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using ReactiveUI;
-using Zafiro.Avalonia;
+using ReactiveUI.Fody.Helpers;
 using Zafiro.Avalonia.Interfaces;
 using Zafiro.Core.Mixins;
 using Zafiro.FileSystem;
@@ -36,7 +36,22 @@ public class MainViewModel : ReactiveObject
             Inputs.Load(Enumerable.Empty<Entry>());
             Outputs.Load(Enumerable.Empty<Entry>());
         });
+
+        Open.ToSignal().Merge(New.ToSignal()).Subscribe(_ => IsContentLoaded = true);
+        UnloadContent = ReactiveCommand.Create(Unload);
     }
+
+    public ReactiveCommand<Unit, Unit> UnloadContent { get; set; }
+
+    private void Unload()
+    {
+        Inputs = new EntryEditorViewModel("Inputs", Enumerable.Empty<Entry>());
+        Outputs = new EntryEditorViewModel("Outputs", Enumerable.Empty<Entry>());
+        IsContentLoaded = false;
+    }
+
+    [Reactive]
+    public bool IsContentLoaded { get; set; }
 
     public ReactiveCommand<Unit, Unit> New { get; set; }
 
