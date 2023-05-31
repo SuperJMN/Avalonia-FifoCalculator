@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             xmlns:views="clr-namespace:FIFOCalculator.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:CompileBindings="True"
+             x:DataType="viewModels:MainViewModel"
+             x:Class="FIFOCalculator.Views.DesktopView">
+	<DockPanel>
+		<Menu x:Name="Menu" DockPanel.Dock="Top">
+			<Menu.Styles>
+				<Style Selector="Menu.Desktop">
+					<Setter Property="DockPanel.Dock" Value="Top" />
+				</Style>
+				<Style Selector="Menu.Mobile">
+					<Setter Property="DockPanel.Dock" Value="Bottom" />
+				</Style>
+			</Menu.Styles>
+			<MenuItem Header="File">
+				<MenuItem Header="New" Command="{Binding New}" />
+				<MenuItem Header="-" />
+				<MenuItem Header="Open" Command="{Binding Open}" />
+				<MenuItem Header="Save" Command="{Binding Save}" />
+			</MenuItem>
+		</Menu>
+		<Grid ColumnDefinitions="* Auto Auto" x:Name="DesktopGrid">
+			<UniformGrid Rows="1">
+				<views:EntryEditorView Classes="Panel" DataContext="{Binding Inputs}" />
+				<views:EntryEditorView Classes="Panel" DataContext="{Binding Outputs}" />
+			</UniformGrid>
+			<GridSplitter Grid.Column="1" Width="4" Background="Gainsboro" />
+			<HeaderedContentControl Grid.Column="2" Classes="Panel CenteredHeader"
+									Header="Simulation">
+				<viewModels:SimulationView Margin="8" DataContext="{Binding Simulation}" />
+			</HeaderedContentControl>
+		</Grid>
+	</DockPanel>
+</UserControl>
