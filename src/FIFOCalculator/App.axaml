@@ -13,6 +13,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="Controls/SvgButton.axaml"/>
 
         <Style Selector="HeaderedContentControl.CenteredHeader">
             <Setter Property="Template">

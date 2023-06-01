@@ -12,12 +12,12 @@ namespace FIFOCalculator.ViewModels;
 
 public class SimulationViewModel : ViewModelBase, ISimulationViewModel
 {
-    public SimulationViewModel(IEnumerable<Entry> inputs, IEnumerable<Entry> outputs)
+    public SimulationViewModel(Func<IEnumerable<Entry>> inputs, Func<IEnumerable<Entry>> outputs)
     {
         Simulate = ReactiveCommand.Create(() =>
         {
             var calculator = new BalanceCalculator(new Store(Maybe<ILogger>.None), Maybe<ILogger>.None);
-            var calculateBalance = calculator.CalculateBalance(inputs.Concat(outputs.Select(entry => entry with { Units = -entry.Units })), From, To);
+            var calculateBalance = calculator.CalculateBalance(inputs().Concat(outputs().Select(entry => entry with { Units = -entry.Units })), From, To);
             return calculateBalance;
         });
 
@@ -33,4 +33,4 @@ public class SimulationViewModel : ViewModelBase, ISimulationViewModel
     public IObservable<Balance> Simulation { get; }
 
     public ReactiveCommand<Unit, Result<Balance>> Simulate { get; }
-}
+} 

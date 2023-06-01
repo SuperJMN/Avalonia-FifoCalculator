@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using FIFOCalculator.ViewModels;
 using System;
 using ReactiveUI;
 

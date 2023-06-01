@@ -22,7 +22,7 @@ public class MainViewModel : ReactiveObject
     {
         Inputs = new EntryEditorViewModel("Inputs", Enumerable.Empty<Entry>());
         Outputs = new EntryEditorViewModel("Outputs", Enumerable.Empty<Entry>());
-        Simulation = new SimulationViewModel(Inputs.Entries.Select(ToEntry), Outputs.Entries.Select(ToEntry));
+        Simulation = new SimulationViewModel(() => Inputs.Entries.Select(ToEntry), () => Outputs.Entries.Select(ToEntry));
 
         Open = ReactiveCommand.CreateFromObservable(() => storage.PickForOpen().SelectMany(m => m.Map(LoadFromFile)));
         Open.Values().WhereSuccess().Do(LoadCatalog).Subscribe();

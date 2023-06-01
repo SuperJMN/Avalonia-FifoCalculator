@@ -9,6 +9,7 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
+             xmlns:controls="clr-namespace:FIFOCalculator.Controls"
              x:CompileBindings="True">
 
 	<UserControl.Resources>
@@ -61,18 +62,9 @@
 
 	</UserControl.Resources>
 
-	<UserControl.Styles>
-		<Style Selector="Button.Tool">
-			<Setter Property="Height" Value="36" />
-			<Setter Property="Width" Value="36" />
-		</Style>
-	</UserControl.Styles>
-
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <Button DockPanel.Dock="Left" Classes="Tool">
-                <Button.Content>
-                </Button.Content>
+            <controls:SvgButton DockPanel.Dock="Left" SvgPath="/Assets/add.svg" >
                 <Button.Flyout>
                     <Flyout Placement="BottomEdgeAlignedLeft">
                         <StackPanel>
@@ -100,11 +92,8 @@
                         </i:Interaction.Behaviors>
                     </Flyout>
                 </Button.Flyout>
-            </Button>
-            <Button DockPanel.Dock="Right" Classes="Tool" Command="{Binding DeleteSelected}">
-                <Button.Content>
-                </Button.Content>
-            </Button>
+            </controls:SvgButton>
+            <controls:SvgButton DockPanel.Dock="Right" SvgPath="/Assets/delete2.svg" Command="{Binding DeleteSelected}" />
             <TextBlock FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding Title}" />
         </DockPanel>
         <DataGrid SelectionMode="Single" ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
