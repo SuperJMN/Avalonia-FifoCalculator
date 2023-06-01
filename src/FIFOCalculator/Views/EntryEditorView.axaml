@@ -8,6 +8,8 @@
              x:DataType="viewModels:EntryEditorViewModel"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
+             xmlns:controls="clr-namespace:FIFOCalculator.Controls"
              x:CompileBindings="True">
 
 	<UserControl.Resources>
@@ -60,19 +62,9 @@
 
 	</UserControl.Resources>
 
-	<UserControl.Styles>
-		<Style Selector="Button.Tool">
-			<Setter Property="Height" Value="36" />
-			<Setter Property="Width" Value="36" />
-		</Style>
-	</UserControl.Styles>
-
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <Button DockPanel.Dock="Left" Classes="Tool">
-                <Button.Content>
-                    <Svg Path="/Assets/add.svg" />
-                </Button.Content>
+            <controls:SvgButton DockPanel.Dock="Left" SvgPath="/Assets/add.svg" >
                 <Button.Flyout>
                     <Flyout Placement="BottomEdgeAlignedLeft">
                         <StackPanel>
@@ -100,24 +92,20 @@
                         </i:Interaction.Behaviors>
                     </Flyout>
                 </Button.Flyout>
-            </Button>
-            <Button DockPanel.Dock="Right" Classes="Tool" Command="{Binding DeleteSelected}">
-                <Button.Content>
-                    <Svg Path="/Assets/delete2.svg" />
-                </Button.Content>
-            </Button>
+            </controls:SvgButton>
+            <controls:SvgButton DockPanel.Dock="Right" SvgPath="/Assets/delete2.svg" Command="{Binding DeleteSelected}" />
             <TextBlock FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding Title}" />
         </DockPanel>
-        <DataGrid SelectionMode="Single" Items="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
+        <DataGrid SelectionMode="Single" ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
             <DataGrid.Columns>
                 <DataGridTextColumn CanUserSort="False" Header="Date" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel"
-                                    Binding="{Binding When, StringFormat='{}{0:d}'}" />
+                                    Binding="{Binding When, Mode=OneWay, StringFormat='{}{0:d}'}" />
                 <DataGridTextColumn CanUserSort="False" Header="Units" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel" Binding="{Binding Units}" />
                 <DataGridTextColumn CanUserSort="False" Header="Price" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel"
-                                    Binding="{Binding PricePerUnit, StringFormat='{}{0:C}'}" />
+                                    Binding="{Binding PricePerUnit, Mode=OneWay, StringFormat='{}{0:C}'}" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using ReactiveUI;
-using Zafiro.Avalonia;
+using ReactiveUI.Fody.Helpers;
 using Zafiro.Avalonia.Interfaces;
 using Zafiro.Core.Mixins;
 using Zafiro.FileSystem;
@@ -20,9 +21,9 @@ public class MainViewModel : ReactiveObject
 
     public MainViewModel(IStorage storage, INotificationService notificationService)
     {
-        Inputs = new EntryEditorViewModel("Inputs", Enumerable.Empty<Entry>());
-        Outputs = new EntryEditorViewModel("Outputs", Enumerable.Empty<Entry>());
-        Simulation = new SimulationViewModel(Inputs.Entries.Select(ToEntry), Outputs.Entries.Select(ToEntry));
+        Inputs = new EntryEditorViewModel("Inputs");
+        Outputs = new EntryEditorViewModel("Outputs");
+        Simulation = new SimulationViewModel(() => Inputs.Entries.Select(ToEntry), () => Outputs.Entries.Select(ToEntry));
 
         Open = ReactiveCommand.CreateFromObservable(() => storage.PickForOpen().SelectMany(m => m.Map(LoadFromFile)));
         Open.Values().WhereSuccess().Do(LoadCatalog).Subscribe();
@@ -36,7 +37,22 @@ public class MainViewModel : ReactiveObject
             Inputs.Load(Enumerable.Empty<Entry>());
             Outputs.Load(Enumerable.Empty<Entry>());
         });
+
+        Open.ToSignal().Merge(New.ToSignal()).Subscribe(_ => IsContentLoaded = true);
+        UnloadContent = ReactiveCommand.Create(Unload);
     }
+
+    public ReactiveCommand<Unit, Unit> UnloadContent { get; set; }
+
+    private void Unload()
+    {
+        Inputs.Load(new List<Entry>());
+        Outputs.Load(new List<Entry>());
+        IsContentLoaded = false;
+    }
+
+    [Reactive]
+    public bool IsContentLoaded { get; set; }
 
     public ReactiveCommand<Unit, Unit> New { get; set; }
 

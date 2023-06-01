@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:FIFOCalculator.Controls">
+    <Design.PreviewWith>
+        <controls:SvgButton Content="fasdf" SvgPath="/Assets/back.svg" />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|SvgButton">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Button Command="{TemplateBinding Command}"
+                        Flyout="{TemplateBinding Flyout}"
+                        CommandParameter="{TemplateBinding CommandParameter}">
+                    <Button.Content>
+                        <DockPanel>
+                            <ContentPresenter Margin="8"
+                                              IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                              VerticalAlignment="Center" HorizontalContentAlignment="Center"
+                                              DockPanel.Dock="{TemplateBinding ContentAlignment}"
+                                              HorizontalAlignment="Center" Content="{TemplateBinding Content}" />
+                            <Svg Height="24" Path="{TemplateBinding SvgPath}" />
+                        </DockPanel>
+                    </Button.Content>
+                </Button>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

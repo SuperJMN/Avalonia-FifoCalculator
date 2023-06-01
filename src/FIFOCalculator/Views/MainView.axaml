@@ -7,107 +7,33 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="FIFOCalculator.Views.MainView"
              x:DataType="vm:MainViewModel"
-             x:CompileBindings="True" Classes="Stretch">
+             x:CompileBindings="True">
 
-	<UserControl.Styles>
-
-		<Style Selector=":is(ContentControl).Panel">
-			<Setter Property="Margin" Value="10" />
-			<Setter Property="BorderBrush" Value="DarkGray" />
-			<Setter Property="BorderThickness" Value="1" />
-		</Style>
-
-		<Style Selector="HeaderedContentControl.CenteredHeader">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate>
-						<Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-							<StackPanel>
-								<ContentPresenter Margin="0 4" HorizontalAlignment="Center"
-                                                  Content="{TemplateBinding Header}" FontWeight="Bold" />
-								<ContentPresenter Content="{TemplateBinding Content}" />
-							</StackPanel>
-						</Border>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-
-		<Style Selector="views|EntryEditorView">
-			<Setter Property="Margin" Value="4" />
-			<Setter Property="BorderBrush" Value="Gray" />
-			<Setter Property="BorderThickness" Value="1" />
-		</Style>
-
-	</UserControl.Styles>
-
-	<DockPanel>
-		<Menu x:Name="Menu">
-			<Menu.Styles>
-				<Style Selector="Menu.Desktop">
-					<Setter Property="DockPanel.Dock" Value="Top" />
-				</Style>
-				<Style Selector="Menu.Mobile">
-					<Setter Property="DockPanel.Dock" Value="Bottom" />
-				</Style>
-			</Menu.Styles>
-			<MenuItem Header="File">
-				<MenuItem Header="New" Command="{Binding New}" />
-				<MenuItem Header="-" />
-				<MenuItem Header="Open" Command="{Binding Open}" />
-				<MenuItem Header="Save" Command="{Binding Save}" />
-			</MenuItem>
-		</Menu>
-		<Panel>
-            <Grid ColumnDefinitions="* Auto Auto" x:Name="DesktopGrid">
-				<Grid.Styles>
-                    <Style Selector="Grid.Desktop">
-                        <Setter Property="IsVisible" Value="True" />
-                    </Style>
-                    <Style Selector="Grid.Mobile">
-                        <Setter Property="IsVisible" Value="False" />
-                    </Style>
-                </Grid.Styles>
-				
-                <UniformGrid Rows="1">
-					<views:EntryEditorView Classes="Panel" DataContext="{Binding Inputs}" />
-					<views:EntryEditorView Classes="Panel" DataContext="{Binding Outputs}" />
-				</UniformGrid>
-				<GridSplitter Grid.Column="1" Width="4" Background="Gainsboro" />
-				<HeaderedContentControl Grid.Column="2" Classes="Panel CenteredHeader" Header="Simulation">
-					<vm:SimulationView Margin="8" DataContext="{Binding Simulation}" />
-				</HeaderedContentControl>
-			</Grid>
-            <Grid RowDefinitions="* Auto Auto" x:Name="MobileGrid">
-                <Grid.Styles>
-                    <Style Selector="Grid.Desktop">
-                        <Setter Property="IsVisible" Value="False" />
-                    </Style>
-                    <Style Selector="Menu.Mobile">
-                        <Setter Property="IsVisible" Value="True" />
-                    </Style>
-                </Grid.Styles>
-				
-                <UniformGrid Columns="1">
-                    <views:EntryEditorView Classes="Panel" DataContext="{Binding Inputs}" />
-                    <views:EntryEditorView Classes="Panel" DataContext="{Binding Outputs}" />
-                </UniformGrid>
-                <GridSplitter Grid.Row="1" Height="4" Background="Gainsboro" />
-                <HeaderedContentControl Grid.Row="2" Classes="Panel CenteredHeader" Header="Simulation">
-                    <vm:SimulationView Margin="8" DataContext="{Binding Simulation}" />
-                </HeaderedContentControl>
-            </Grid>
-		</Panel>
-	</DockPanel>
+	<ContentControl x:Name="ContentControl" Content="{Binding}">
+		<ContentControl.Styles>
+			<Style Selector="ContentControl.Mobile">
+				<Setter Property="ContentTemplate">
+					<DataTemplate DataType="vm:MainViewModel">
+						<views:MobileView />
+					</DataTemplate>
+				</Setter>
+			</Style>
+			<Style Selector="ContentControl.Desktop">
+				<Setter Property="ContentTemplate">
+					<Setter.Value>
+						<DataTemplate DataType="vm:MainViewModel">
+							<views:DesktopView/>
+						</DataTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+		</ContentControl.Styles>
+	</ContentControl>
 
 	<Interaction.Behaviors>
 		<AdaptiveBehavior SourceControl="{Binding $parent[TopLevel]}">
-			<AdaptiveClassSetter MinWidth="0" MaxWidth="900" TargetControl="Menu" ClassName="Mobile" />
-			<AdaptiveClassSetter MinWidth="900" MaxWidth="Infinity" TargetControl="Menu" ClassName="Desktop" />
-			<AdaptiveClassSetter MinWidth="0" MaxWidth="900" TargetControl="DesktopGrid" ClassName="Mobile" />
-			<AdaptiveClassSetter MinWidth="900" MaxWidth="Infinity" TargetControl="DesktopGrid" ClassName="Desktop" />
-            <AdaptiveClassSetter MinWidth="0" MaxWidth="900" TargetControl="MobileGrid" ClassName="Mobile" />
-            <AdaptiveClassSetter MinWidth="900" MaxWidth="Infinity" TargetControl="MobileGrid" ClassName="Desktop" />
+			<AdaptiveClassSetter MinWidth="0" MaxWidth="900" TargetControl="ContentControl" ClassName="Mobile" />
+			<AdaptiveClassSetter MinWidth="900" MaxWidth="Infinity" TargetControl="ContentControl" ClassName="Desktop" />
 		</AdaptiveBehavior>
 	</Interaction.Behaviors>
 
