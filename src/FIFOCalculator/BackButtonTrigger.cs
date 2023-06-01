@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia;
@@ -6,29 +6,33 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Xaml.Interactivity;
 
-namespace FIFOCalculator;
-
-public class BackButtonTrigger : Trigger<Visual>
+namespace FIFOCalculator
 {
-    private IDisposable subs = Disposable.Empty;
-
-    protected override void OnAttachedToVisualTree()
+    public class BackButtonTrigger : Trigger<Visual>
     {
-        base.OnAttachedToVisualTree();
+        private IDisposable subs = Disposable.Empty;
 
-        var topLevel = TopLevel.GetTopLevel(AssociatedObject)!;
-        subs = Observable.FromEventPattern<RoutedEventArgs>(topLevel, "BackRequested")
-            .Do(eventPattern =>
+        protected override void OnAttachedToVisualTree()
+        {
+            base.OnAttachedToVisualTree();
+
+            var topLevel = TopLevel.GetTopLevel(AssociatedObject) as Window;
+            if (topLevel != null)
             {
-                eventPattern.EventArgs.Handled = true;
-                Interaction.ExecuteActions(this, Actions, null);
-            })
-            .Subscribe();
-    }
+                subs = Observable.FromEventPattern<RoutedEventArgs>(handler => topLevel.BackRequested += handler, handler => topLevel.BackRequested -= handler)
+                    .Do(eventPattern =>
+                    {
+                        eventPattern.EventArgs.Handled = true;
+                        Interaction.ExecuteActions(this, Actions, null);
+                    })
+                    .Subscribe();
+            }
+        }
 
-    protected override void OnDetachedFromVisualTree()
-    {
-        base.OnDetachedFromVisualTree();
-        subs.Dispose();
+        protected override void OnDetachedFromVisualTree()
+        {
+            base.OnDetachedFromVisualTree();
+            subs.Dispose();
+        }
     }
 }
