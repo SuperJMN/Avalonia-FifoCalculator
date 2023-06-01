@@ -1,27 +1,17 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace FIFOCalculator.Views
+namespace FIFOCalculator.Views;
+
+public partial class MobileView : UserControl
 {
-    public partial class MobileView : UserControl
+    public MobileView()
     {
-        public MobileView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        protected override void OnLoaded()
-        {
-            base.OnLoaded();
-            if (TopLevel.GetTopLevel(this) is { } topLevel)
-            {
-                topLevel.BackRequested += this.MainView_BackRequested;
-            }
-        }
-
-        private void MainView_BackRequested(object? sender, RoutedEventArgs e)
-        {
-            
-        }
+    protected override void OnUnloaded()
+    {
+        base.OnUnloaded();
     }
 }

@@ -19,12 +19,10 @@ public class EntryEditorViewModel : ReactiveValidationObject
     private readonly ReadOnlyObservableCollection<EntryViewModel> entries;
     private readonly SourceList<EntryViewModel> source;
 
-    public EntryEditorViewModel(string title, IEnumerable<Entry> initial)
+    public EntryEditorViewModel(string title)
     {
         Title = title;
         source = new SourceList<EntryViewModel>();
-
-        source.AddRange(initial.Select(FromEntry));
 
         source
             .Connect()

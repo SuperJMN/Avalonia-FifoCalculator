@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -20,8 +21,8 @@ public class MainViewModel : ReactiveObject
 
     public MainViewModel(IStorage storage, INotificationService notificationService)
     {
-        Inputs = new EntryEditorViewModel("Inputs", Enumerable.Empty<Entry>());
-        Outputs = new EntryEditorViewModel("Outputs", Enumerable.Empty<Entry>());
+        Inputs = new EntryEditorViewModel("Inputs");
+        Outputs = new EntryEditorViewModel("Outputs");
         Simulation = new SimulationViewModel(() => Inputs.Entries.Select(ToEntry), () => Outputs.Entries.Select(ToEntry));
 
         Open = ReactiveCommand.CreateFromObservable(() => storage.PickForOpen().SelectMany(m => m.Map(LoadFromFile)));
@@ -45,8 +46,8 @@ public class MainViewModel : ReactiveObject
 
     private void Unload()
     {
-        Inputs = new EntryEditorViewModel("Inputs", Enumerable.Empty<Entry>());
-        Outputs = new EntryEditorViewModel("Outputs", Enumerable.Empty<Entry>());
+        Inputs.Load(new List<Entry>());
+        Outputs.Load(new List<Entry>());
         IsContentLoaded = false;
     }
 

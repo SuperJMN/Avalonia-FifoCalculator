@@ -5,14 +5,22 @@
              xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
              xmlns:views="clr-namespace:FIFOCalculator.Views"
              xmlns:controls="clr-namespace:FIFOCalculator.Controls"
+             xmlns:fifoCalculator="clr-namespace:FIFOCalculator"
+             xmlns:core="clr-namespace:Avalonia.Xaml.Interactions.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 x:CompileBindings="True"
 			 x:DataType="viewModels:MainViewModel"
              x:Class="FIFOCalculator.Views.MobileView">
     <Panel>
 		<UniformGrid Columns="1" IsVisible="{Binding !IsContentLoaded}" HorizontalAlignment="Center">
-			<Button Content="New" Command="{Binding New}" />
-			<Button Content="Load" Command="{Binding Open}" />
+            <UniformGrid.Styles>
+                <Style Selector="Button">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                </Style>	
+            </UniformGrid.Styles>
+            <controls:SvgButton SvgPath="/Assets/new.svg" Content="New" Command="{Binding New}" />
+			<controls:SvgButton SvgPath="/Assets/open.svg" Content="Load" Command="{Binding Open}" />
 		</UniformGrid>
 		<DockPanel IsVisible="{Binding IsContentLoaded}">
             <UniformGrid Rows="1" DockPanel.Dock="Bottom" Height="32">
@@ -47,4 +55,11 @@
 			</Grid>
         </DockPanel>
 	</Panel>
+
+	<Interaction.Behaviors>
+        <fifoCalculator:BackButtonTrigger>
+			<core:InvokeCommandAction2 Command="{Binding UnloadContent}" />
+        </fifoCalculator:BackButtonTrigger>
+    </Interaction.Behaviors>
+
 </UserControl>
