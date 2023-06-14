@@ -1,7 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:FIFOCalculator"
-             xmlns:views="clr-namespace:FIFOCalculator.Views"
              x:Class="FIFOCalculator.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -13,6 +12,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Zafiro.Avalonia/Styles.axaml"/>
         <StyleInclude Source="Controls/SvgButton.axaml"/>
 
         <Style Selector="HeaderedContentControl.CenteredHeader">
@@ -45,4 +45,5 @@
         </Style>
 
     </Application.Styles>
+
 </Application>

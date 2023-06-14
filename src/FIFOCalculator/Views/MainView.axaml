@@ -4,37 +4,47 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FIFOCalculator.ViewModels"
              xmlns:views="clr-namespace:FIFOCalculator.Views"
+             xmlns:c="clr-namespace:Zafiro.Avalonia.Controls;assembly=Zafiro.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="FIFOCalculator.Views.MainView"
              x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
 
-	<ContentControl x:Name="ContentControl" Content="{Binding}">
-		<ContentControl.Styles>
-			<Style Selector="ContentControl.Mobile">
-				<Setter Property="ContentTemplate">
-					<DataTemplate DataType="vm:MainViewModel">
-						<views:MobileView />
-					</DataTemplate>
-				</Setter>
-			</Style>
-			<Style Selector="ContentControl.Desktop">
-				<Setter Property="ContentTemplate">
-					<Setter.Value>
-						<DataTemplate DataType="vm:MainViewModel">
-							<views:DesktopView/>
-						</DataTemplate>
-					</Setter.Value>
-				</Setter>
-			</Style>
-		</ContentControl.Styles>
-	</ContentControl>
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="vm:DataEntryViewModel">
+			<DockPanel>
+				<UniformGrid DockPanel.Dock="Bottom" Rows="1" DataContext="{Binding LoadStoreViewModel}">
+					<UniformGrid.Styles>
+						<Style Selector="Button">
+							<Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+						</Style>
+                    </UniformGrid.Styles>
+					<Button Command="{Binding New}" Content="New" />
+					<Button Command="{Binding Open}" Content="Open" />
+					<Button Command="{Binding Save}" Content="Save" />
+				</UniformGrid>
+				<UniformGrid Columns="1">
+					<views:EntryEditorView DataContext="{Binding Inputs}" />
+					<views:EntryEditorView DataContext="{Binding Outputs}" />
+				</UniformGrid>
+			</DockPanel>
+		</DataTemplate>
+		<DataTemplate DataType="vm:ISimulationViewModel">
+			<vm:SimulationView DataContext="{Binding}" />
+		</DataTemplate>
+	</UserControl.DataTemplates>
 
-	<Interaction.Behaviors>
-		<AdaptiveBehavior SourceControl="{Binding $parent[TopLevel]}">
-			<AdaptiveClassSetter MinWidth="0" MaxWidth="900" TargetControl="ContentControl" ClassName="Mobile" />
-			<AdaptiveClassSetter MinWidth="900" MaxWidth="Infinity" TargetControl="ContentControl" ClassName="Desktop" />
-		</AdaptiveBehavior>
-	</Interaction.Behaviors>
+	<c:MasterDetailsView ItemsSource="{Binding Sections}" SelectedItem="{Binding ActiveSection}" CompactWidth="480">
+		<c:MasterDetailsView.DetailsTemplate>
+			<DataTemplate DataType="vm:Section">
+				<ContentControl Content="{Binding ViewModel}" />
+			</DataTemplate>
+		</c:MasterDetailsView.DetailsTemplate>
+		<c:MasterDetailsView.ItemTemplate>
+			<DataTemplate DataType="vm:Section">
+				<TextBlock Text="{Binding Name}" />
+			</DataTemplate>
+		</c:MasterDetailsView.ItemTemplate>
+	</c:MasterDetailsView>
 
 </UserControl>

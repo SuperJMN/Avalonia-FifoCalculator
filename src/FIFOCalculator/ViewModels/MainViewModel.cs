@@ -1,87 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FIFOCalculator.Models;
+﻿using System.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Zafiro.Avalonia.Interfaces;
-using Zafiro.Core.Mixins;
-using Zafiro.FileSystem;
 
 namespace FIFOCalculator.ViewModels;
 
 public class MainViewModel : ReactiveObject
 {
-    public EntryEditorViewModel Inputs { get; set; }
-    public EntryEditorViewModel Outputs { get; set; }
-
     public MainViewModel(IStorage storage, INotificationService notificationService)
     {
-        Inputs = new EntryEditorViewModel("Inputs");
-        Outputs = new EntryEditorViewModel("Outputs");
-        Simulation = new SimulationViewModel(() => Inputs.Entries.Select(ToEntry), () => Outputs.Entries.Select(ToEntry));
-
-        Open = ReactiveCommand.CreateFromObservable(() => storage.PickForOpen().SelectMany(m => m.Map(LoadFromFile)));
-        Open.Values().WhereSuccess().Do(LoadCatalog).Subscribe();
-        Save = ReactiveCommand.CreateFromObservable(() => storage.PickForSave("Accounts", "txt").SelectMany(async m => await m.Map(SaveToFile)));
+        var dataEntryViewModel = new DataEntryViewModel(notificationService, storage);
         
-        Open.Values().WhereFailure().Do(notificationService.ShowMessage).Subscribe();
-        Save.Values().WhereFailure().Do(notificationService.ShowMessage).Subscribe();
-
-        New = ReactiveCommand.Create(() =>
+        Sections = new[]
         {
-            Inputs.Load(Enumerable.Empty<Entry>());
-            Outputs.Load(Enumerable.Empty<Entry>());
-        });
+            new Section("Data entry", dataEntryViewModel),
+            new Section("Simulate", new SimulationViewModel(() => dataEntryViewModel.Inputs.ToEntries(), () => dataEntryViewModel.Outputs.ToEntries()))
+        };
 
-        Open.ToSignal().Merge(New.ToSignal()).Subscribe(_ => IsContentLoaded = true);
-        UnloadContent = ReactiveCommand.Create(Unload);
+        ActiveSection = Sections.First();
     }
 
-    public ReactiveCommand<Unit, Unit> UnloadContent { get; set; }
-
-    private void Unload()
-    {
-        Inputs.Load(new List<Entry>());
-        Outputs.Load(new List<Entry>());
-        IsContentLoaded = false;
-    }
+    public Section[] Sections { get; set; }
 
     [Reactive]
-    public bool IsContentLoaded { get; set; }
-
-    public ReactiveCommand<Unit, Unit> New { get; set; }
-
-    private void LoadCatalog(EntryCatalog catalog)
-    {
-        Inputs.Load(catalog.Inputs);
-        Outputs.Load(catalog.Outputs);
-    }
-
-    private static async Task<Result<EntryCatalog>> LoadFromFile(IStorable storable)
-    {
-        await using var s = await storable.OpenRead();
-        return await EntryStore.Load(s);
-    }
-
-    private async Task<Result> SaveToFile(IStorable storable)
-    {
-        await using var s = await storable.OpenWrite();
-        return await EntryStore.Save(s, new EntryCatalog(Inputs.ToEntries().ToList(), Outputs.ToEntries().ToList()));
-    }
-
-    public ReactiveCommand<Unit, Maybe<Result>> Save { get; }
-
-    public ReactiveCommand<Unit, Maybe<Result<EntryCatalog>>> Open { get; }
-
-    public SimulationViewModel Simulation { get; }
-
-    private static Entry ToEntry(EntryViewModel x)
-    {
-        return new Entry(x.When, x.Units, x.PricePerUnit);
-    }
+    public Section ActiveSection { get; set; }
 }
