@@ -88,7 +88,7 @@ class Build : NukeBuild
         var androidProject = Solution.AllProjects.First(project => project.Name.EndsWith("Android"));
         
         DotNetPublish(settings => settings
-            .SetProperty("ApplicationVersion", GitVersion.MajorMinorPatch)
+            .SetProperty("ApplicationVersion", GitVersion.CommitsSinceVersionSource)
             .SetProperty("ApplicationDisplayVersion", GitVersion.MajorMinorPatch)
             .SetConfiguration(Configuration)
             .SetProject(androidProject)
