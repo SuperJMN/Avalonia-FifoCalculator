@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace FIFOCalculator.Views
 {
-    public partial class SimulationView : UserControl
+    public partial class DataEntryView : UserControl
     {
-        public SimulationView()
+        public DataEntryView()
         {
             InitializeComponent();
         }

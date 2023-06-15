@@ -4,26 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
              mc:Ignorable="d" d:DesignHeight="450"
-             x:Class="FIFOCalculator.ViewModels.SimulationView"
+             x:Class="FIFOCalculator.Views.SimulationView"
              x:DataType="viewModels:ISimulationViewModel"
-             x:CompileBindings="True">
-
-
-
-	<StackPanel Spacing="8">
-		<HeaderedContentControl Header="From">
+             x:CompileBindings="True" Padding="10">
+    <StackPanel Spacing="8">
+        <TextBlock Text="Please, specify the interval in which you want to calculate the balances" />
+        <HeaderedContentControl Header="From">
 			<DatePicker SelectedDate="{Binding From}" />
 		</HeaderedContentControl>
 		<HeaderedContentControl Header="To">
 			<DatePicker SelectedDate="{Binding To}" />
 		</HeaderedContentControl>
 		<StackPanel DataContext="{Binding Simulation^}" IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}" Spacing="8">
-			<HeaderedContentControl Header="Sold">
-				<TextBlock HorizontalAlignment="Center" Text="{Binding SoldValue, StringFormat='{}{0:C}'}" />
-			</HeaderedContentControl>
-			<HeaderedContentControl Header="Pending value">
-				<TextBlock HorizontalAlignment="Center" Text="{Binding RemainingValue, StringFormat='{}{0:C}'}" />
-			</HeaderedContentControl>
+            <HeaderedContentControl Header="Sold">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding SoldValue, StringFormat='{}{0:C}'}" />
+            </HeaderedContentControl>
+            <HeaderedContentControl Header="Pending value">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding RemainingValue, StringFormat='{}{0:C}'}" />
+            </HeaderedContentControl>
 		</StackPanel>
 		<Button HorizontalAlignment="Center" Content="Simulate" Command="{Binding Simulate}" />
 	</StackPanel>

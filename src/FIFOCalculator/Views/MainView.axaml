@@ -3,38 +3,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FIFOCalculator.ViewModels"
-             xmlns:views="clr-namespace:FIFOCalculator.Views"
              xmlns:c="clr-namespace:Zafiro.Avalonia.Controls;assembly=Zafiro.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="FIFOCalculator.Views.MainView"
              x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
 
-	<UserControl.DataTemplates>
-		<DataTemplate DataType="vm:DataEntryViewModel">
-			<DockPanel>
-				<UniformGrid DockPanel.Dock="Bottom" Rows="1" DataContext="{Binding LoadStoreViewModel}">
-					<UniformGrid.Styles>
-						<Style Selector="Button">
-							<Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-						</Style>
-                    </UniformGrid.Styles>
-					<Button Command="{Binding New}" Content="New" />
-					<Button Command="{Binding Open}" Content="Open" />
-					<Button Command="{Binding Save}" Content="Save" />
-				</UniformGrid>
-				<UniformGrid Columns="1">
-					<views:EntryEditorView DataContext="{Binding Inputs}" />
-					<views:EntryEditorView DataContext="{Binding Outputs}" />
-				</UniformGrid>
-			</DockPanel>
-		</DataTemplate>
-		<DataTemplate DataType="vm:ISimulationViewModel">
-			<vm:SimulationView DataContext="{Binding}" />
-		</DataTemplate>
-	</UserControl.DataTemplates>
-
-	<c:MasterDetailsView ItemsSource="{Binding Sections}" SelectedItem="{Binding ActiveSection}" CompactWidth="480">
+    <c:MasterDetailsView ItemsSource="{Binding Sections}" SelectedItem="{Binding ActiveSection}" CompactWidth="480">
 		<c:MasterDetailsView.DetailsTemplate>
 			<DataTemplate DataType="vm:Section">
 				<ContentControl Content="{Binding ViewModel}" />
