@@ -1,10 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using FIFOCalculator.ViewModels;
 using FIFOCalculator.Views;
-using Zafiro.Avalonia;
+using Zafiro.Avalonia.Mixins;
 
 namespace FIFOCalculator
 {
@@ -17,7 +15,7 @@ namespace FIFOCalculator
 
         public override void OnFrameworkInitializationCompleted()
         {
-            this.Connect(() => new MainView(), control => CompositionRoot.Create(TopLevel.GetTopLevel(control)!));
+            this.Connect(() => new MainView(), control => CompositionRoot.Create(TopLevel.GetTopLevel(control)!), () => new MainWindow());
 
             base.OnFrameworkInitializationCompleted();
         }

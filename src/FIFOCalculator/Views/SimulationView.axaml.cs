@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace FIFOCalculator.ViewModels
+namespace FIFOCalculator.Views
 {
     public partial class SimulationView : UserControl
     {
