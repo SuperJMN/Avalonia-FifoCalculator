@@ -85,11 +85,13 @@ class Build : NukeBuild
         .DependsOn(RestoreWorkloads)
         .Executes(() =>
     {
-        var desktopProject = Solution.AllProjects.First(project => project.Name.EndsWith("Android"));
-
+        var androidProject = Solution.AllProjects.First(project => project.Name.EndsWith("Android"));
+        
         DotNetPublish(settings => settings
+            .SetProperty("ApplicationVersion", GitVersion.MajorMinorPatch)
+            .SetProperty("ApplicationDisplayVersion", GitVersion.MajorMinorPatch)
             .SetConfiguration(Configuration)
-            .SetProject(desktopProject)
+            .SetProject(androidProject)
             .SetOutput(PackagesDirectory));
     });
 
