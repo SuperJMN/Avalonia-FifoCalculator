@@ -22,8 +22,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-	</ItemGroup>
-
+		<PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.1" />	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FIFOCalculator\FIFOCalculator.csproj" />
 	</ItemGroup>
