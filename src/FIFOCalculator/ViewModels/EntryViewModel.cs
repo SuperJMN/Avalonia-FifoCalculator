@@ -18,4 +18,5 @@ public class EntryViewModel
     public DateTime When { get; init; }
     public decimal Units { get; init; }
     public decimal PricePerUnit { get; init; }
+    public decimal Total => Units * PricePerUnit;
 }

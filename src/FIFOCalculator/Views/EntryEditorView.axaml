@@ -80,6 +80,7 @@
                                 <NumericUpDown VerticalAlignment="Top" AllowSpin="False"
                                                ShowButtonSpinner="False" Minimum="0" Watermark="Price"
                                                DockPanel.Dock="Right" Value="{Binding PricePerUnit}" />
+                                <TextBlock IsVisible="{Binding Total, Converter={x:Static ObjectConverters.IsNotNull}}" VerticalAlignment="Center" Text="{Binding Total, StringFormat='({0:C})'}" />
                             </StackPanel>
                             <Button HorizontalAlignment="Right" Margin="10" DockPanel.Dock="Right"
                                     Command="{Binding Add}" Content="Add" />
@@ -105,6 +106,9 @@
                 <DataGridTextColumn CanUserSort="False" Header="Price" Width="*" IsReadOnly="True"
                                     x:DataType="viewModels:EntryViewModel"
                                     Binding="{Binding PricePerUnit, Mode=OneWay, StringFormat='{}{0:C}'}" />
+                <DataGridTextColumn CanUserSort="False" Header="Total" Width="*" IsReadOnly="True"
+                                    x:DataType="viewModels:EntryViewModel"
+                                    Binding="{Binding Total, Mode=OneWay, StringFormat='{}{0:C}'}" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
