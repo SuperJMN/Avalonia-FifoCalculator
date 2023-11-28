@@ -10,6 +10,7 @@ public class MainViewModel : ReactiveObject
     public MainViewModel(IStorage storage, INotificationService notificationService)
     {
         var dataEntryViewModel = new DataEntryViewModel(notificationService, storage);
+        DataEntry = dataEntryViewModel;
         
         Sections = new[]
         {
@@ -19,6 +20,8 @@ public class MainViewModel : ReactiveObject
 
         ActiveSection = Sections.First();
     }
+
+    public DataEntryViewModel DataEntry { get; set; }
 
     public Section[] Sections { get; set; }
 

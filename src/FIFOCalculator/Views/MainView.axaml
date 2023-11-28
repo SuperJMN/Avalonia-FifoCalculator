@@ -9,17 +9,29 @@
              x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
 
-    <c:MasterDetailsView ItemsSource="{Binding Sections}" SelectedItem="{Binding ActiveSection}" CompactWidth="480">
-		<c:MasterDetailsView.DetailsTemplate>
-			<DataTemplate DataType="vm:Section">
-				<ContentControl Content="{Binding ViewModel}" />
-			</DataTemplate>
-		</c:MasterDetailsView.DetailsTemplate>
-		<c:MasterDetailsView.ItemTemplate>
-			<DataTemplate DataType="vm:Section">
-				<TextBlock Text="{Binding Name}" />
-			</DataTemplate>
-		</c:MasterDetailsView.ItemTemplate>
-	</c:MasterDetailsView>
+	<Panel>
+		<c:MasterDetailsView ItemsSource="{Binding Sections}" SelectedItem="{Binding ActiveSection}" CompactWidth="480">
+			<c:MasterDetailsView.DetailsTemplate>
+				<DataTemplate DataType="vm:Section">
+					<ContentControl Content="{Binding ViewModel}" />
+				</DataTemplate>
+			</c:MasterDetailsView.DetailsTemplate>
+			<c:MasterDetailsView.ItemTemplate>
+				<DataTemplate DataType="vm:Section">
+					<TextBlock Text="{Binding Name}" />
+				</DataTemplate>
+			</c:MasterDetailsView.ItemTemplate>
+		</c:MasterDetailsView>
+        <UniformGrid Margin="8" VerticalAlignment="Bottom" HorizontalAlignment="Left" DockPanel.Dock="Bottom" Rows="1" DataContext="{Binding DataEntry.LoadStoreViewModel}">
+            <UniformGrid.Styles>
+                <Style Selector="Button">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                </Style>
+            </UniformGrid.Styles>
+            <Button Command="{Binding New}" Content="New" />
+            <Button Command="{Binding Open}" Content="Open" />
+            <Button Command="{Binding Save}" Content="Save" />
+        </UniformGrid>
+	</Panel>
 
 </UserControl>

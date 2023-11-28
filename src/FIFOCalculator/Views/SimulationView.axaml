@@ -16,10 +16,10 @@
 			<DatePicker SelectedDate="{Binding To}" />
 		</HeaderedContentControl>
 		<StackPanel DataContext="{Binding Simulation^}" IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}" Spacing="8">
-            <HeaderedContentControl Header="Sold">
+            <HeaderedContentControl Header="Balance">
                 <TextBlock HorizontalAlignment="Center" Text="{Binding SoldValue, StringFormat='{}{0:C}'}" />
             </HeaderedContentControl>
-            <HeaderedContentControl Header="Pending value">
+            <HeaderedContentControl Header="Pending stock value">
                 <TextBlock HorizontalAlignment="Center" Text="{Binding RemainingValue, StringFormat='{}{0:C}'}" />
             </HeaderedContentControl>
 		</StackPanel>
