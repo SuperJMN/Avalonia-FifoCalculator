@@ -50,7 +50,7 @@ public class EntryEditorViewModel : ReactiveValidationObject
 
     public ReadOnlyObservableCollection<EntryViewModel> Entries => entries;
     public string Title { get; set; }
-    public IReactiveCommand Add { get; set; }
+    public ReactiveCommandBase<Unit, Unit> Add { get; set; }
 
     [Reactive] public EntryViewModel? SelectedEntry { get; set; }
 
