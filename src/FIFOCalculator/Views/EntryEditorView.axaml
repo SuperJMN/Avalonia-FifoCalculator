@@ -86,7 +86,7 @@
                                     Command="{Binding Add}" Content="Add" />
                         </StackPanel>
                         <i:Interaction.Behaviors>
-                            <ia:DataTriggerBehavior Binding="{Binding Add.IsExecuting^}" Value="false">
+                            <ia:DataTriggerBehavior Binding="{Binding Added^}" Value="false">
                                 <ia:CallMethodAction TargetObject="{Binding $parent[Flyout]}" MethodName="Hide" />
                             </ia:DataTriggerBehavior>
                         </i:Interaction.Behaviors>

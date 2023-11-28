@@ -8,23 +8,23 @@ namespace FIFOCalculator.Models;
 public class Store
 {
     private readonly Maybe<ILogger> logger;
-    private readonly LinkedList<StockPrice> entries = new();
-    public decimal Value => entries.Sum(x => x.Value);
-    public decimal Units => entries.Sum(x => x.Units);
+    private readonly LinkedList<Order> orderList = new();
+    public decimal InventoryValue => orderList.Sum(x => x.LineItemValue);
+    public decimal Units => orderList.Sum(x => x.Units);
 
     public Store(Maybe<ILogger> logger)
     {
         this.logger = logger;
     }
 
-    public void Buy(StockPrice stockPrice)
+    public void Buy(Order order)
     {
-        entries.AddLast(stockPrice);
+        orderList.AddLast(order);
     }
 
     public Result<decimal> Sell(decimal unitsToTake, decimal price)
     {
-        if (entries.Count == 0)
+        if (orderList.Count == 0)
         {
             return Result.Failure<decimal>("Nothing to shell");
         }
@@ -35,8 +35,8 @@ public class Store
 
         while (remainingUnitsToTake > 0)
         {
-            var current = entries.First();
-            entries.RemoveFirst();
+            var current = orderList.First();
+            orderList.RemoveFirst();
             logger.Execute(x => x.Information(" - Segmento actual: Quedan {Units} unidades a {Price:C}", current.Units, current.Price));
             var unitsTaken = Min(current.Units, remainingUnitsToTake);
             logger.Execute(x => x.Information(" - Hemos podido tomar {Taken} unidades del segmento", unitsTaken));
@@ -44,11 +44,7 @@ public class Store
             var consumed = current with { Units = current.Units - unitsTaken };
             if (consumed.Units != 0)
             {
-                entries.AddFirst(consumed);
-            }
-            else
-            {
-                //logger.Execute(x => x.Information(" - Hemos consumido un elemento de la cola"));
+                orderList.AddFirst(consumed);
             }
 
             remainingUnitsToTake -= unitsTaken;

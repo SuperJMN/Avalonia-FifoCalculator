@@ -30,7 +30,7 @@ public class BalanceCalculator
             if (operation.Units > 0)
             {
                 logger.Execute(x => x.Information("{Date:d}: Compra de {Value:C} ({Units} a {Price:C})", operation.When, operation.Units * operation.PricePerUnit, operation.Units, operation.PricePerUnit));
-                store.Buy(new StockPrice(operation.Units, operation.PricePerUnit));
+                store.Buy(new Order(operation.Units, operation.PricePerUnit));
             }
             else
             {
@@ -59,6 +59,6 @@ public class BalanceCalculator
 
         logger.Execute(x => x.Information("Balance total {Balance:C}", balance));
 
-        return new Balance(balance, store.Value);
+        return new Balance(balance, store.InventoryValue);
     }
 }
