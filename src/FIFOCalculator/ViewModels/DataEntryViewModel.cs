@@ -1,14 +1,14 @@
-﻿using Zafiro.Avalonia.Interfaces;
+﻿using Zafiro.UI;
 
 namespace FIFOCalculator.ViewModels;
 
 public class DataEntryViewModel : ViewModelBase
 {
-    public DataEntryViewModel(INotificationService notificationService, IStorage storage)
+    public DataEntryViewModel(INotificationService notificationService, IFilePicker filePicker)
     {
         Inputs = new EntryEditorViewModel("Inputs");
         Outputs = new EntryEditorViewModel("Outputs");
-        LoadStoreViewModel = new LoadStoreViewModel(this, storage, notificationService);
+        LoadStoreViewModel = new LoadStoreViewModel(this, filePicker, notificationService);
     }
 
     public LoadStoreViewModel LoadStoreViewModel { get; set; }

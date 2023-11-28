@@ -10,6 +10,6 @@ public static class CompositionRoot
 {
     public static MainViewModel Create(TopLevel topLevel)
     {
-        return new MainViewModel(new AvaloniaStorage(topLevel.StorageProvider), new NotificationService(new WindowNotificationManager(topLevel)));
+        return new MainViewModel(new AvaloniaFilePicker(topLevel.StorageProvider), new NotificationService(new WindowNotificationManager(topLevel)));
     }
 }

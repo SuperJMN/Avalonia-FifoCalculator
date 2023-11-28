@@ -3,16 +3,17 @@ using ReactiveUI;
 using System;
 using System.Reactive;
 using FIFOCalculator.Models;
-using Zafiro.Core.Mixins;
 using System.Collections.Generic;
 using System.Linq;
 using ReactiveUI.Fody.Helpers;
+using Zafiro.CSharpFunctionalExtensions;
+using Zafiro.UI;
 
 namespace FIFOCalculator.ViewModels;
 
 public class SimulationViewModel : ViewModelBase, ISimulationViewModel
 {
-    public SimulationViewModel(Func<IEnumerable<Entry>> inputs, Func<IEnumerable<Entry>> outputs)
+    public SimulationViewModel(Func<IEnumerable<Entry>> inputs, Func<IEnumerable<Entry>> outputs, INotificationService notificationService)
     {
         Simulate = ReactiveCommand.Create(() =>
         {
@@ -21,7 +22,8 @@ public class SimulationViewModel : ViewModelBase, ISimulationViewModel
             return calculateBalance;
         });
 
-        Simulation = Simulate.WhereSuccess();
+        Simulation = Simulate.Successes();
+        Simulate.HandleErrorsWith(notificationService);
     }
 
     [Reactive]

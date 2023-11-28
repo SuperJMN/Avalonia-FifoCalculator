@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -6,9 +7,9 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using ReactiveUI;
-using Zafiro.Avalonia.Interfaces;
-using Zafiro.Core.Mixins;
+using Zafiro.CSharpFunctionalExtensions;
 using Zafiro.FileSystem;
+using Zafiro.UI;
 
 namespace FIFOCalculator.ViewModels;
 
@@ -21,16 +22,16 @@ public class LoadStoreViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Maybe<Result<EntryCatalog>>> Open { get; }
 
-    public LoadStoreViewModel(DataEntryViewModel dataEntryViewModel, IStorage storage, INotificationService notificationService)
+    public LoadStoreViewModel(DataEntryViewModel dataEntryViewModel, IFilePicker storage, INotificationService notificationService)
     {
         this.dataEntryViewModel = dataEntryViewModel;
 
         Open = ReactiveCommand.CreateFromObservable(() => storage.PickForOpen().SelectMany(m => m.Map(LoadFromFile)));
-        Open.Values().WhereSuccess().Do(LoadCatalog).Subscribe();
+        Open.Values().Successes().Do(LoadCatalog).Subscribe();
         Save = ReactiveCommand.CreateFromObservable(() => storage.PickForSave("Accounts", "txt").SelectMany(async m => await m.Map(SaveToFile)));
 
-        Open.Values().WhereFailure().Do(notificationService.ShowMessage).Subscribe();
-        Save.Values().WhereFailure().Do(notificationService.ShowMessage).Subscribe();
+        Open.Values().HandleErrorsWith(notificationService);
+        Save.Values().HandleErrorsWith(notificationService);
 
         New = ReactiveCommand.Create(() =>
         {
@@ -39,10 +40,9 @@ public class LoadStoreViewModel : ViewModelBase
         });
     }
 
-    private static async Task<Result<EntryCatalog>> LoadFromFile(IStorable storable)
+    private static Task<Result<EntryCatalog>> LoadFromFile(IZafiroFile file)
     {
-        await using var s = await storable.OpenRead();
-        return await EntryStore.Load(s);
+        return file.GetContents().Bind(EntryStore.Load);
     }
 
     private void LoadCatalog(EntryCatalog catalog)
@@ -51,9 +51,24 @@ public class LoadStoreViewModel : ViewModelBase
         dataEntryViewModel.Outputs.Load(catalog.Outputs);
     }
 
-    private async Task<Result> SaveToFile(IStorable storable)
+    private Task<Result> SaveToFile(IZafiroFile storable)
     {
-        await using var s = await storable.OpenWrite();
-        return await EntryStore.Save(s, new EntryCatalog(dataEntryViewModel.Inputs.ToEntries().ToList(), dataEntryViewModel.Outputs.ToEntries().ToList()));
+        return ToStream()
+            .Bind(async stream =>
+            {
+                using (stream)
+                {
+                    return await storable.SetContents(stream);
+                }
+            });
+    }
+
+    private async Task<Result<Stream>> ToStream()
+    {
+        var memoryStream = new MemoryStream();
+        var entryCatalog = new EntryCatalog(dataEntryViewModel.Inputs.ToEntries().ToList(), dataEntryViewModel.Outputs.ToEntries().ToList());
+        await EntryStore.Save(memoryStream, entryCatalog);
+        memoryStream.Position = 0;
+        return memoryStream;
     }
 }
