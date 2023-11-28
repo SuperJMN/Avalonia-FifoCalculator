@@ -11,6 +11,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Remove="Assets\icon.png" />
     <None Remove="Assets\save.svg" />
   </ItemGroup>
 

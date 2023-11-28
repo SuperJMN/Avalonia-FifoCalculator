@@ -1,0 +1,34 @@
+{
+  "Executables": {
+    "AvaloniaSyncer.Desktop": {
+      "CommandName": "fifocalculator",
+      "DesktopEntry": {
+        "Icons": {
+          "32": "icon.png",
+          "64": "icon.png"
+        },
+        "Name": "Avalonia FIFO Calculator",
+        "StartupWmClass": "Avalonia FIFO Calculator",
+        "Keywords": [
+          "FIFO",
+          "Taxes",
+          "Income"
+        ],
+        "Comment": "This is an application to calculate balances using the FIFO method.",
+        "Categories": [
+          "Financial"
+        ]
+      }
+    }
+  },
+  "PackageMetadata": {
+    "Maintainer": "SuperJMN",
+    "PackageName": "FIFOCalculator",
+    "ApplicationName": "Avalonia FIFO Calculator",
+    "Architecture": "any",
+    "Homepage": "https://github.com/SuperJMN/Avalonia-FifoCalculator",
+    "License": "MIT",
+    "Description": "Application to calculate balances using the FIFO method",
+    "Version": "any"
+  }
+}
