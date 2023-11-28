@@ -11,6 +11,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
+using Zafiro.Mixins;
 
 namespace FIFOCalculator.ViewModels;
 
@@ -43,10 +44,14 @@ public class EntryEditorViewModel : ReactiveValidationObject
             Units = null;
         }, this.IsValid());
 
+        Added = Add.ToSignal();
+
         DeleteSelected = ReactiveCommand.Create(() => source.Remove(SelectedEntry!), this.WhenAnyValue(x => x.SelectedEntry).Select(x => x != null));
 
         total = this.WhenAnyValue(x => x.PricePerUnit, x => x.Units, (a, b) => a * b).ToProperty(this, x => x.Total);
     }
+
+    public IObservable<Unit> Added { get; }
 
     public ReadOnlyObservableCollection<EntryViewModel> Entries => entries;
     public string Title { get; set; }
@@ -64,10 +69,7 @@ public class EntryEditorViewModel : ReactiveValidationObject
 
     public decimal? Total => total.Value;
 
-    public IEnumerable<Entry> ToEntries()
-    {
-        return Entries.Select(ToEntry);
-    }
+    public IEnumerable<Entry> ToEntries() => Entries.Select(ToEntry);
 
     public void Load(IEnumerable<Entry> toLoad)
     {
@@ -78,13 +80,7 @@ public class EntryEditorViewModel : ReactiveValidationObject
         });
     }
 
-    private static Entry ToEntry(EntryViewModel vm)
-    {
-        return new Entry(vm.When, vm.Units, vm.PricePerUnit);
-    }
+    private static Entry ToEntry(EntryViewModel vm) => new(vm.When, vm.Units, vm.PricePerUnit);
 
-    private static EntryViewModel FromEntry(Entry entry)
-    {
-        return new EntryViewModel(entry);
-    }
+    private static EntryViewModel FromEntry(Entry entry) => new(entry);
 }
