@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             mc:Ignorable="d" 
+             x:Class="FIFOCalculator.Views.LogView"
+             x:DataType="viewModels:MainViewModel"
+             x:CompileBindings="True">
+  <DockPanel Width="400">
+    <TextBlock Text="Log" Margin="8" DockPanel.Dock="Top" FontWeight="Bold" />
+    <Button DockPanel.Dock="Bottom" Command="{Binding CopyLog}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8" Content="Copy" />
+    <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding LogEntries}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="viewModels:LogEntry">
+                    <TextBlock Text="{Binding Message}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.Styles>
+                <Style Selector="ItemsControl:empty">
+                    <Setter Property="Template">
+                        <ControlTemplate>
+                            <TextBlock Text="&lt;Empty&gt;" />
+                        </ControlTemplate>
+                    </Setter>
+                </Style>
+            </ItemsControl.Styles>
+        </ItemsControl>
+    </ScrollViewer>
+</DockPanel>
+</UserControl>

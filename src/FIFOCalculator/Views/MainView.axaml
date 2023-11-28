@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FIFOCalculator.ViewModels"
              xmlns:c="clr-namespace:Zafiro.Avalonia.Controls;assembly=Zafiro.Avalonia"
+             xmlns:views="clr-namespace:FIFOCalculator.Views"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="FIFOCalculator.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -22,16 +23,24 @@
 				</DataTemplate>
 			</c:MasterDetailsView.ItemTemplate>
 		</c:MasterDetailsView>
-        <UniformGrid Margin="8" VerticalAlignment="Bottom" HorizontalAlignment="Left" DockPanel.Dock="Bottom" Rows="1" DataContext="{Binding DataEntry.LoadStoreViewModel}">
-            <UniformGrid.Styles>
-                <Style Selector="Button">
-                    <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-                </Style>
-            </UniformGrid.Styles>
-            <Button Command="{Binding New}" Content="New" />
-            <Button Command="{Binding Open}" Content="Open" />
-            <Button Command="{Binding Save}" Content="Save" />
-        </UniformGrid>
+		<UniformGrid Margin="8" VerticalAlignment="Bottom" HorizontalAlignment="Left" DockPanel.Dock="Bottom" Rows="1"
+                     DataContext="{Binding DataEntry.LoadStoreViewModel}">
+			<UniformGrid.Styles>
+				<Style Selector="Button">
+					<Setter Property="HorizontalAlignment" Value="Stretch" />
+				</Style>
+			</UniformGrid.Styles>
+			<Button Command="{Binding New}" Content="New" />
+			<Button Command="{Binding Open}" Content="Open" />
+			<Button Command="{Binding Save}" Content="Save" />
+		</UniformGrid>
+		<Button Content="..." VerticalAlignment="Bottom" HorizontalAlignment="Right">
+			<Button.Flyout>
+				<Flyout Placement="TopEdgeAlignedRight">
+                    <views:LogView MaxHeight="500" />
+                </Flyout>
+			</Button.Flyout>
+		</Button>
 	</Panel>
 
 </UserControl>

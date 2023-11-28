@@ -8,8 +8,8 @@ namespace FIFOCalculator.Views;
 
 public static class CompositionRoot
 {
-    public static MainViewModel Create(TopLevel topLevel)
+    public static MainViewModel Create(TopLevel topLevel, DynamicDataSink logger)
     {
-        return new MainViewModel(new AvaloniaFilePicker(topLevel.StorageProvider), new NotificationService(new WindowNotificationManager(topLevel)));
+        return new MainViewModel(new AvaloniaFilePicker(topLevel.StorageProvider), new NotificationService(new WindowNotificationManager(topLevel)), logger);
     }
 }
