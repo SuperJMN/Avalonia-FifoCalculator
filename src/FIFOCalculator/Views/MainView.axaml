@@ -34,7 +34,7 @@
 			<Button Command="{Binding Open}" Content="Open" />
 			<Button Command="{Binding Save}" Content="Save" />
 		</UniformGrid>
-		<Button Content="..." VerticalAlignment="Bottom" HorizontalAlignment="Right">
+		<Button Content="..." VerticalAlignment="Top" HorizontalAlignment="Right">
 			<Button.Flyout>
 				<Flyout Placement="TopEdgeAlignedRight">
                     <views:LogView MaxHeight="500" />
