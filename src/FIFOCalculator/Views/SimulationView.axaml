@@ -9,20 +9,24 @@
              x:CompileBindings="True" Padding="10">
     <StackPanel Spacing="8">
         <TextBlock Text="Please, specify the interval in which you want to calculate the balances" />
+        <HeaderedContentControl Header="Year">
+            <ComboBox ItemsSource="{Binding AvailableYears}"
+                      SelectedItem="{Binding SelectedYear}" />
+        </HeaderedContentControl>
         <HeaderedContentControl Header="From">
-			<DatePicker SelectedDate="{Binding From}" />
-		</HeaderedContentControl>
-		<HeaderedContentControl Header="To">
-			<DatePicker SelectedDate="{Binding To}" />
-		</HeaderedContentControl>
-		<StackPanel DataContext="{Binding Simulation^}" IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}" Spacing="8">
+            <DatePicker SelectedDate="{Binding From}" />
+        </HeaderedContentControl>
+        <HeaderedContentControl Header="To">
+            <DatePicker SelectedDate="{Binding To}" />
+        </HeaderedContentControl>
+        <StackPanel DataContext="{Binding Simulation^}" IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}" Spacing="8">
             <HeaderedContentControl Header="Balance on sale">
                 <TextBlock HorizontalAlignment="Center" Text="{Binding SoldValue, StringFormat='{}{0:C}'}" />
             </HeaderedContentControl>
             <HeaderedContentControl Header="Inventory value">
                 <TextBlock HorizontalAlignment="Center" Text="{Binding RemainingValue, StringFormat='{}{0:C}'}" />
             </HeaderedContentControl>
-		</StackPanel>
-		<Button HorizontalAlignment="Center" Content="Simulate" Command="{Binding Simulate}" />
-	</StackPanel>
+        </StackPanel>
+        <Button HorizontalAlignment="Center" Content="Simulate" Command="{Binding Simulate}" />
+    </StackPanel>
 </UserControl>
