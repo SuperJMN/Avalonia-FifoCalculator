@@ -20,14 +20,19 @@ public class EntryEditorViewModel : ReactiveValidationObject
     private readonly ReadOnlyObservableCollection<EntryViewModel> entries;
     private readonly SourceList<EntryViewModel> source;
     private readonly ObservableAsPropertyHelper<decimal?> total;
+    private readonly IObservable<IChangeSet<EntryViewModel>> connected;
 
     public EntryEditorViewModel(string title)
     {
         Title = title;
         source = new SourceList<EntryViewModel>();
 
-        source
+        connected = source
             .Connect()
+            .Publish()
+            .RefCount();
+
+        connected
             .Sort(SortExpressionComparer<EntryViewModel>.Ascending(x => x.When))
             .Bind(out entries)
             .Subscribe();
@@ -49,6 +54,10 @@ public class EntryEditorViewModel : ReactiveValidationObject
         DeleteSelected = ReactiveCommand.Create(() => source.Remove(SelectedEntry!), this.WhenAnyValue(x => x.SelectedEntry).Select(x => x != null));
 
         total = this.WhenAnyValue(x => x.PricePerUnit, x => x.Units, (a, b) => a * b).ToProperty(this, x => x.Total);
+
+        EntriesCollection = connected
+            .Transform(x => x.Entry)
+            .ToCollection();
     }
 
     public IObservable<Unit> Added { get; }
@@ -68,6 +77,8 @@ public class EntryEditorViewModel : ReactiveValidationObject
     [Reactive] public decimal? Units { get; set; }
 
     public decimal? Total => total.Value;
+
+    public IObservable<IReadOnlyCollection<Entry>> EntriesCollection { get; }
 
     public IEnumerable<Entry> ToEntries() => Entries.Select(ToEntry);
 
