@@ -7,6 +7,5 @@ steps:
 - script: /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/local/lib/android/sdk "platform-tools"
   displayName: Install Android SDK "Platform Tools"
 
-- powershell: .\build.ps1 publishgithubrelease --project "src\FIFOCalculator.Desktop\FIFOCalculator.Desktop.csproj"
-  env:
-    GitHubAuthenticationToken: $(GitHubAuthenticationToken)
+- pwsh: dotnetdeployer github release --github-token $(GitHubApiKey) --android-keystore-base64 $(AndroidBase64Keystore) --android-key-alias $(AndroidSigningKeyAlias) --android-key-pass $(AndroidSigningKeyPass) --android-store-pass $(AndroidSigningStorePass) --release-name AngorApp
+  displayName: Release App
