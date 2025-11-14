@@ -1,8 +1,49 @@
+trigger:
+  branches:
+    include: [ master ]
+pr:
+  branches:
+    include: [ master, "*" ]
+
+pool:
+  vmImage: ubuntu-latest
+
 variables:
-  Agent.Source.Git.ShallowFetchDepth: 0
+  - group: api-keys
+  - name: DOTNET_CLI_TELEMETRY_OPTOUT
+    value: '1'
 
 steps:
-- checkout: self
-
-- pwsh: dotnetdeployer github release --github-token $(GitHubApiKey) --android-keystore-base64 $(AndroidBase64Keystore) --android-key-alias $(AndroidSigningKeyAlias) --android-key-pass $(AndroidSigningKeyPass) --android-store-pass $(AndroidSigningStorePass) --release-name AngorApp
-  displayName: Release App
+  # Checkout completo + submódulos
+  - checkout: self
+    submodules: true
+    fetchDepth: 0
+  
+  # Install .NET 9 SDK
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '9.0.x'  # or '9.0.100' for exact version
+      displayName: 'Install .NET 9 SDK'
+  
+  # DotnetDeployer.Tool
+  - pwsh: |
+      dotnet tool install --global DotnetDeployer.Tool
+      dotnetdeployer --version
+    displayName: Install DotnetDeployer.Tool
+  
+  # Empaquetado + publicación NuGet + release GitHub (real en master, dry-run en el resto)
+  - pwsh: |
+      $branch   = '$(Build.SourceBranch)'
+      $isMaster = $branch -eq 'refs/heads/master'
+      Write-Host "Branch: $branch. Is master: $isMaster"
+      
+      if ($isMaster) {
+        Write-Host 'Publishing NuGet packages'    
+        dotnetdeployer github release --github-token '$(GitHubApiKey)'
+      } else {
+        Write-Host 'NuGet dry run (no push)'
+        dotnetdeployer github release --github-token '$(GitHubApiKey)' --no-publish
+      }
+    
+    displayName: Package, Publish and Release
