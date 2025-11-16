@@ -23,7 +23,7 @@ public class MainViewModel : ReactiveObject
         Sections = new[]
         {
             new Section("Data entry", dataEntryViewModel),
-            new Section("Simulate", new SimulationViewModel(() => dataEntryViewModel.Inputs.ToEntries(), () => dataEntryViewModel.Outputs.ToEntries(), notificationService))
+            new Section("Simulate", new SimulationViewModel(dataEntryViewModel.Inputs, dataEntryViewModel.Outputs, notificationService))
         };
 
         ActiveSection = Sections.First();
