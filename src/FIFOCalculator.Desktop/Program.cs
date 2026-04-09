@@ -17,6 +17,7 @@ namespace FIFOCalculator.Desktop
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                .WithDeveloperTools()
                 .LogToTrace()
                 .UseReactiveUI();
     }
