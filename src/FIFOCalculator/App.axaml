@@ -6,6 +6,7 @@
 
     <Application.DataTemplates>
         <misc:DataTemplateInclude Source="avares://Zafiro.Avalonia/DataTemplates.axaml" />
+        <DataTypeViewLocator />
         <NamingConventionGeneratedViewLocator />
     </Application.DataTemplates>
 

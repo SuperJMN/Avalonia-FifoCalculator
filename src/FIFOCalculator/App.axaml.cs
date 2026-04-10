@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using FIFOCalculator.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,12 +41,14 @@ public partial class App : Application
 
         this.Connect(
             () => new ShellView(),
-            _ =>
+            view =>
             {
-                services.AddSingleton<IFileSystemPicker>(sp =>
+                services.AddSingleton<IFileSystemPicker>(_ =>
                 {
-                    var topLevel = ApplicationUtils.TopLevel().Value;
-                    return new AvaloniaFileSystemPicker(topLevel.StorageProvider);
+                    // Resolve StorageProvider from the main window via ApplicationLifetime.
+                    // TopLevel.GetTopLevel(view) is null here because the view isn't attached yet.
+                    var desktop = (IClassicDesktopStyleApplicationLifetime)ApplicationLifetime!;
+                    return new AvaloniaFileSystemPicker(desktop.MainWindow!.StorageProvider);
                 });
 
                 var provider = services.BuildServiceProvider();
