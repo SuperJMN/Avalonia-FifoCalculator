@@ -5,9 +5,8 @@
              xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
              mc:Ignorable="d" 
              x:Class="FIFOCalculator.Views.LogView"
-             x:DataType="viewModels:MainViewModel"
-             x:CompileBindings="True">
-  <DockPanel Width="400">
+             x:DataType="viewModels:LogViewModel">
+  <DockPanel>
     <TextBlock Text="Log" Margin="8" DockPanel.Dock="Top" FontWeight="Bold" />
     <Button DockPanel.Dock="Bottom" Command="{Binding CopyLog}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8" Content="Copy" />
     <ScrollViewer>

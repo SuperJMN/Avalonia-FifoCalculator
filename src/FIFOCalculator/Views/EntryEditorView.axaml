@@ -6,8 +6,6 @@
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
              x:Class="FIFOCalculator.Views.EntryEditorView"
              x:DataType="viewModels:EntryEditorViewModel"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:controls="clr-namespace:FIFOCalculator.Controls"
              x:CompileBindings="True">
 
@@ -69,68 +67,36 @@
         </DockPanel>
         <Panel>
             <DataGrid SelectionMode="Single" ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
-                <DataGrid.Styles>
-                    <Style Selector="DataGridCell">
-                        <Setter Property="TextBlock.TextAlignment" Value="Right" />
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="BorderBrush" Value="{StaticResource ButtonBackground}" />
-                    </Style>
-                    <Style Selector="DataGridRow">
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="BorderBrush">
-                            <SolidColorBrush Color="{StaticResource SystemBaseLowColor}" Opacity="0.5" />
-                        </Setter>
-                    </Style>
-                </DataGrid.Styles>
                 <DataGrid.Columns>
-                    <DataGridTextColumn CanUserSort="False" Header="Date" Width="Auto" IsReadOnly="True"
-                                        x:DataType="viewModels:EntryViewModel"
-                                        Binding="{Binding When, Mode=OneWay, StringFormat='{}{0:d}'}" />
-                    <DataGridTextColumn CanUserSort="False" Header="Units" Width="Auto" IsReadOnly="True"
-                                        x:DataType="viewModels:EntryViewModel" Binding="{Binding Units}" />
-                    <DataGridTextColumn CanUserSort="False" Header="Price" Width="Auto" IsReadOnly="True"
-                                        x:DataType="viewModels:EntryViewModel"
-                                        Binding="{Binding PricePerUnit, Mode=OneWay, StringFormat='{}{0:C}'}" />
+                    <DataGridTemplateColumn Header="Date" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="viewModels:EntryViewModel">
+                                <TextBlock Text="{Binding When, StringFormat='{}{0:d}'}"
+                                           VerticalAlignment="Center" Margin="12,0" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate x:DataType="viewModels:EntryViewModel">
+                                <CalendarDatePicker SelectedDate="{Binding When}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn CanUserSort="False" Header="Units" Width="Auto"
+                                        IsReadOnly="False"
+                                        Binding="{Binding Units}" />
+                    <DataGridTextColumn CanUserSort="False" Header="Price" Width="Auto"
+                                        IsReadOnly="False"
+                                        Binding="{Binding PricePerUnit}" />
                     <DataGridTextColumn CanUserSort="False" Header="Total" Width="Auto" IsReadOnly="True"
-                                        x:DataType="viewModels:EntryViewModel"
                                         Binding="{Binding Total, Mode=OneWay, StringFormat='{}{0:C}'}" />
                 </DataGrid.Columns>
             </DataGrid>
-            <ToggleButton Margin="10" CornerRadius="20" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" x:Name="AddButton" DockPanel.Dock="Bottom">
-                <ToggleButton.Content>
-                    <PathIcon Foreground="Black"
-                              Data="m 12 4 a 1 1 0 0 0 -1 1 v 6 H 5 a 1 1 0 0 0 -1 1 a 1 1 0 0 0 1 1 h 6 v 6 a 1 1 0 0 0 1 1 a 1 1 0 0 0 1 -1 v -6 h 6 a 1 1 0 0 0 1 -1 a 1 1 0 0 0 -1 -1 H 13 V 5 A 1 1 0 0 0 12 4 Z" />
-                </ToggleButton.Content>
-            </ToggleButton>
-            <Popup IsOpen="{Binding #AddButton.IsChecked}" PlacementTarget="AddButton" Placement="TopEdgeAlignedRight">
-                <Border Padding="12" Background="{StaticResource MenuFlyoutPresenterBackground}">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <StackPanel.Styles>
-                                <Style Selector="UniformGrid > :is(Control)">
-                                    <Setter Property="Margin" Value="1 0" />
-                                </Style>
-                            </StackPanel.Styles>
-                            <TextBox VerticalAlignment="Top" Watermark="Date" Text="{Binding DateText}" />
-                            <NumericUpDown VerticalAlignment="Top" AllowSpin="False"
-                                           ShowButtonSpinner="False" Minimum="0" Watermark="Units"
-                                           DockPanel.Dock="Right" Value="{Binding Units}" />
-                            <NumericUpDown VerticalAlignment="Top" AllowSpin="False"
-                                           ShowButtonSpinner="False" Minimum="0" Watermark="Price"
-                                           DockPanel.Dock="Right" Value="{Binding PricePerUnit}" />
-                            <TextBlock IsVisible="{Binding Total, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                       VerticalAlignment="Center" Text="{Binding Total, StringFormat='({0:C})'}" />
-                        </StackPanel>
-                        <Button HorizontalAlignment="Right" Margin="10" DockPanel.Dock="Right"
-                                Command="{Binding Add}" Content="Add" />
-                    </StackPanel>
-                </Border>
-                <i:Interaction.Behaviors>
-                    <ia:DataTriggerBehavior Binding="{Binding Added^}" Value="false">
-                        <ia:CallMethodAction TargetObject="{Binding $parent[Flyout]}" MethodName="Hide" />
-                    </ia:DataTriggerBehavior>
-                </i:Interaction.Behaviors>
-            </Popup>
+            <Button Margin="10" CornerRadius="20" Width="40" Height="40"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Command="{Binding Add}">
+                <PathIcon Foreground="Black"
+                          Data="m 12 4 a 1 1 0 0 0 -1 1 v 6 H 5 a 1 1 0 0 0 -1 1 a 1 1 0 0 0 1 1 h 6 v 6 a 1 1 0 0 0 1 1 a 1 1 0 0 0 1 -1 v -6 h 6 a 1 1 0 0 0 1 -1 a 1 1 0 0 0 -1 -1 H 13 V 5 A 1 1 0 0 0 12 4 Z" />
+            </Button>
         </Panel>
     </DockPanel>
 </UserControl>

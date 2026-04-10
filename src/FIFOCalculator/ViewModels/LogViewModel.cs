@@ -6,28 +6,17 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using DynamicData;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Zafiro.UI;
+using Zafiro.UI.Shell.Utils;
 
 namespace FIFOCalculator.ViewModels;
 
-public class MainViewModel : ReactiveObject
+[Section(icon: "fa-list", sortIndex: 2, FriendlyName = "Log")]
+public partial class LogViewModel : ViewModelBase
 {
     private readonly ReadOnlyObservableCollection<LogEntry> logEntries;
 
-    public MainViewModel(IFilePicker storage, INotificationService notificationService, IObservableLogger logger)
+    public LogViewModel(IObservableLogger logger)
     {
-        var dataEntryViewModel = new DataEntryViewModel(notificationService, storage);
-        DataEntry = dataEntryViewModel;
-        
-        Sections = new[]
-        {
-            new Section("Data entry", dataEntryViewModel),
-            new Section("Simulate", new SimulationViewModel(dataEntryViewModel.Inputs, dataEntryViewModel.Outputs, notificationService))
-        };
-
-        ActiveSection = Sections.First();
-
         logger.Events
             .Connect()
             .Transform(x => new LogEntry(x))
@@ -43,14 +32,7 @@ public class MainViewModel : ReactiveObject
         });
     }
 
-    public ReactiveCommand<Unit, Unit> CopyLog { get; set; }
-
-    public DataEntryViewModel DataEntry { get; set; }
-
-    public Section[] Sections { get; set; }
-
-    [Reactive]
-    public Section ActiveSection { get; set; }
+    public ReactiveCommand<Unit, Unit> CopyLog { get; }
 
     public ReadOnlyObservableCollection<LogEntry> LogEntries => logEntries;
 }

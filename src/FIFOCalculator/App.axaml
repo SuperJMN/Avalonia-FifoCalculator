@@ -1,17 +1,18 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:FIFOCalculator"
+             xmlns:misc="clr-namespace:Zafiro.Avalonia.Misc;assembly=Zafiro.Avalonia"
              x:Class="FIFOCalculator.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <misc:DataTemplateInclude Source="avares://Zafiro.Avalonia/DataTemplates.axaml" />
+        <DataTypeViewLocator />
+        <NamingConventionGeneratedViewLocator />
     </Application.DataTemplates>
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://Zafiro.Avalonia/Styles.axaml"/>
         <StyleInclude Source="Controls/SvgButton.axaml"/>
 
