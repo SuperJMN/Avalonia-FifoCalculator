@@ -6,12 +6,12 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using DynamicData;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Zafiro.UI;
 
 namespace FIFOCalculator.ViewModels;
 
-public class MainViewModel : ReactiveObject
+public partial class MainViewModel : ReactiveObject
 {
     private readonly ReadOnlyObservableCollection<LogEntry> logEntries;
 
@@ -49,8 +49,7 @@ public class MainViewModel : ReactiveObject
 
     public Section[] Sections { get; set; }
 
-    [Reactive]
-    public Section ActiveSection { get; set; }
+    [Reactive] private Section _activeSection;
 
     public ReadOnlyObservableCollection<LogEntry> LogEntries => logEntries;
 }

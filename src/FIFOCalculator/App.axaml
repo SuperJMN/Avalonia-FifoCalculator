@@ -11,7 +11,7 @@
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml" />
         <StyleInclude Source="avares://Zafiro.Avalonia/Styles.axaml"/>
         <StyleInclude Source="Controls/SvgButton.axaml"/>
 

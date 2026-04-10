@@ -8,18 +8,14 @@ using DynamicData;
 using DynamicData.Binding;
 using FIFOCalculator.Models;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using ReactiveUI.Validation.Extensions;
-using ReactiveUI.Validation.Helpers;
-using Zafiro.Mixins;
+using ReactiveUI.SourceGenerators;
 
 namespace FIFOCalculator.ViewModels;
 
-public class EntryEditorViewModel : ReactiveValidationObject
+public partial class EntryEditorViewModel : ReactiveObject
 {
     private readonly ReadOnlyObservableCollection<EntryViewModel> entries;
     private readonly SourceList<EntryViewModel> source;
-    private readonly ObservableAsPropertyHelper<decimal?> total;
     private readonly IObservable<IChangeSet<EntryViewModel>> connected;
 
     public EntryEditorViewModel(string title)
@@ -33,50 +29,30 @@ public class EntryEditorViewModel : ReactiveValidationObject
             .RefCount();
 
         connected
-            .Sort(SortExpressionComparer<EntryViewModel>.Ascending(x => x.When))
+            .AutoRefreshOnObservable(vm => vm.WhenAnyValue(x => x.When))
+            .Sort(SortExpressionComparer<EntryViewModel>.Ascending(x => x.When ?? DateTime.MinValue))
             .Bind(out entries)
             .Subscribe();
 
-        this.ValidationRule(x => x.DateText, this.WhenAnyValue(model => model.DateText, s => DateTime.TryParse(s, out _)), "Invalid date string");
-        this.ValidationRule(x => x.PricePerUnit, s => s is > 0, "Invalid price");
-        this.ValidationRule(x => x.Units, s => s is > 0, "Invalid number");
-
         Add = ReactiveCommand.Create(() =>
         {
-            source.Add(FromEntry(new Entry(DateTime.Parse(DateText!), Units!.Value, PricePerUnit!.Value)));
-            DateText = "";
-            PricePerUnit = null;
-            Units = null;
-        }, this.IsValid());
-
-        Added = Add.ToSignal();
+            source.Add(FromEntry(new Entry(DateTime.Today, 0, 0)));
+        });
 
         DeleteSelected = ReactiveCommand.Create(() => source.Remove(SelectedEntry!), this.WhenAnyValue(x => x.SelectedEntry).Select(x => x != null));
 
-        total = this.WhenAnyValue(x => x.PricePerUnit, x => x.Units, (a, b) => a * b).ToProperty(this, x => x.Total);
-
         EntriesCollection = connected
-            .Transform(x => x.Entry)
+            .AutoRefreshOnObservable(vm => vm.WhenAnyValue(x => x.When, x => x.Units, x => x.PricePerUnit))
+            .Transform(x => x.ToEntry())
             .ToCollection();
     }
 
-    public IObservable<Unit> Added { get; }
+    [Reactive] private EntryViewModel? _selectedEntry;
 
     public ReadOnlyObservableCollection<EntryViewModel> Entries => entries;
     public string Title { get; set; }
     public ReactiveCommandBase<Unit, Unit> Add { get; set; }
-
-    [Reactive] public EntryViewModel? SelectedEntry { get; set; }
-
-    [Reactive] public ReactiveCommand<Unit, bool> DeleteSelected { get; set; }
-
-    [Reactive] public string? DateText { get; set; }
-
-    [Reactive] public decimal? PricePerUnit { get; set; }
-
-    [Reactive] public decimal? Units { get; set; }
-
-    public decimal? Total => total.Value;
+    public ReactiveCommand<Unit, bool> DeleteSelected { get; set; }
 
     public IObservable<IReadOnlyCollection<Entry>> EntriesCollection { get; }
 
@@ -91,7 +67,7 @@ public class EntryEditorViewModel : ReactiveValidationObject
         });
     }
 
-    private static Entry ToEntry(EntryViewModel vm) => new(vm.When, vm.Units, vm.PricePerUnit);
+    private static Entry ToEntry(EntryViewModel vm) => vm.ToEntry();
 
     private static EntryViewModel FromEntry(Entry entry) => new(entry);
 }

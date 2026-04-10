@@ -6,13 +6,13 @@ using System.Reactive.Linq;
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Zafiro.CSharpFunctionalExtensions;
 using Zafiro.UI;
 
 namespace FIFOCalculator.ViewModels;
 
-public class SimulationViewModel : ViewModelBase, ISimulationViewModel
+public partial class SimulationViewModel : ViewModelBase, ISimulationViewModel
 {
     private readonly ObservableAsPropertyHelper<IReadOnlyList<Entry>> entries;
     private readonly ObservableAsPropertyHelper<IReadOnlyList<int>> availableYears;
@@ -70,11 +70,9 @@ public class SimulationViewModel : ViewModelBase, ISimulationViewModel
             .InvokeCommand(Simulate);
     }
 
-    [Reactive] public DateTimeOffset? From { get; set; }
-
-    [Reactive] public DateTimeOffset? To { get; set; }
-
-    [Reactive] public int? SelectedYear { get; set; }
+    [Reactive] private DateTimeOffset? _from;
+    [Reactive] private DateTimeOffset? _to;
+    [Reactive] private int? _selectedYear;
 
     public IObservable<Balance> Simulation { get; }
 

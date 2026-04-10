@@ -6,6 +6,8 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FIFOCalculator.Views.MainWindow"
         Icon="/Assets/icon.png"
+        Width="700"
+        Height="500"
         Title="Avalonia FIFO Calculator">
         <views:MainView />
 </Window>
