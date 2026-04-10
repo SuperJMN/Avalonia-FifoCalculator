@@ -9,16 +9,20 @@ using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Zafiro.CSharpFunctionalExtensions;
 using Zafiro.UI;
+using Zafiro.UI.Shell.Utils;
 
 namespace FIFOCalculator.ViewModels;
 
+[Section(icon: "fa-chart-line", sortIndex: 1, FriendlyName = "Simulate")]
 public partial class SimulationViewModel : ViewModelBase, ISimulationViewModel
 {
     private readonly ObservableAsPropertyHelper<IReadOnlyList<Entry>> entries;
     private readonly ObservableAsPropertyHelper<IReadOnlyList<int>> availableYears;
 
-    public SimulationViewModel(EntryEditorViewModel inputs, EntryEditorViewModel outputs, INotificationService notificationService)
+    public SimulationViewModel(DataEntryViewModel dataEntry, INotificationService notificationService)
     {
+        var inputs = dataEntry.Inputs;
+        var outputs = dataEntry.Outputs;
         var inputEntries = inputs.EntriesCollection
             .Select(list => list.OrderBy(entry => entry.When).ToList())
             .Publish()

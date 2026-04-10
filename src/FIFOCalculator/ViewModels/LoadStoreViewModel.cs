@@ -8,7 +8,7 @@ using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using ReactiveUI;
 using Zafiro.CSharpFunctionalExtensions;
-using Zafiro.FileSystem;
+using Zafiro.DivineBytes;
 using Zafiro.UI;
 
 namespace FIFOCalculator.ViewModels;
@@ -18,20 +18,53 @@ public class LoadStoreViewModel : ViewModelBase
     private readonly DataEntryViewModel dataEntryViewModel;
     public ReactiveCommand<Unit, Unit> New { get; set; }
 
-    public ReactiveCommand<Unit, Maybe<Result>> Save { get; }
+    public ReactiveCommand<Unit, Unit> Open { get; }
 
-    public ReactiveCommand<Unit, Maybe<Result<EntryCatalog>>> Open { get; }
+    public ReactiveCommand<Unit, Unit> Save { get; }
 
-    public LoadStoreViewModel(DataEntryViewModel dataEntryViewModel, IFilePicker storage, INotificationService notificationService)
+    public LoadStoreViewModel(DataEntryViewModel dataEntryViewModel, IFileSystemPicker storage, INotificationService notificationService)
     {
         this.dataEntryViewModel = dataEntryViewModel;
 
-        Open = ReactiveCommand.CreateFromObservable(() => storage.PickForOpen().SelectMany(m => m.Map(LoadFromFile)));
-        Open.Values().Successes().Do(LoadCatalog).Subscribe();
-        Save = ReactiveCommand.CreateFromObservable(() => storage.PickForSave("Accounts", "txt").SelectMany(async m => await m.Map(SaveToFile)));
+        Open = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var pickResult = await storage.PickForOpen();
+            if (pickResult.IsFailure) return;
 
-        Open.Values().HandleErrorsWith(notificationService);
-        Save.Values().HandleErrorsWith(notificationService);
+            var maybeSource = pickResult.Value;
+            if (maybeSource.HasNoValue) return;
+
+            var bytesResult = await maybeSource.Value.ReadAll();
+            if (bytesResult.IsFailure)
+            {
+                await notificationService.Show(bytesResult.Error, Maybe<string>.None);
+                return;
+            }
+
+            using var ms = new MemoryStream(bytesResult.Value);
+            var catalogResult = await EntryStore.Load(ms);
+            if (catalogResult.IsFailure)
+            {
+                await notificationService.Show(catalogResult.Error, Maybe<string>.None);
+                return;
+            }
+
+            LoadCatalog(catalogResult.Value);
+        });
+
+        Save = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var maybeDest = await storage.PickForSave("Accounts", Maybe.From(".txt"));
+            if (maybeDest.HasNoValue) return;
+
+            var stream = await ToStream();
+            var byteSource = ByteSource.FromStream(stream);
+            var result = await maybeDest.Value.SetContents(byteSource);
+            if (result.IsFailure)
+            {
+                await notificationService.Show(result.Error, Maybe<string>.None);
+            }
+        });
 
         New = ReactiveCommand.Create(() =>
         {
@@ -40,30 +73,13 @@ public class LoadStoreViewModel : ViewModelBase
         });
     }
 
-    private static Task<Result<EntryCatalog>> LoadFromFile(IZafiroFile file)
-    {
-        return file.GetContents().Bind(EntryStore.Load);
-    }
-
     private void LoadCatalog(EntryCatalog catalog)
     {
         dataEntryViewModel.Inputs.Load(catalog.Inputs);
         dataEntryViewModel.Outputs.Load(catalog.Outputs);
     }
 
-    private Task<Result> SaveToFile(IZafiroFile storable)
-    {
-        return ToStream()
-            .Bind(async stream =>
-            {
-                using (stream)
-                {
-                    return await storable.SetContents(stream);
-                }
-            });
-    }
-
-    private async Task<Result<Stream>> ToStream()
+    private async Task<Stream> ToStream()
     {
         var memoryStream = new MemoryStream();
         var entryCatalog = new EntryCatalog(dataEntryViewModel.Inputs.ToEntries().ToList(), dataEntryViewModel.Outputs.ToEntries().ToList());
