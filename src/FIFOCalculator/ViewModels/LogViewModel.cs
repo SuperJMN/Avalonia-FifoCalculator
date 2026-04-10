@@ -3,7 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input.Platform;
 using DynamicData;
 using ReactiveUI;
 using Zafiro.UI.Shell.Utils;
@@ -25,9 +27,14 @@ public partial class LogViewModel : ViewModelBase
 
         CopyLog = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { Clipboard: not null } window })
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
             {
-                await window.Clipboard.SetTextAsync(string.Join(Environment.NewLine, logger.Events.Items.Select(x => x.RenderMessage())));
+                var clipboard = TopLevel.GetTopLevel(window)?.Clipboard;
+                if (clipboard is not null)
+                {
+                    var text = string.Join(Environment.NewLine, logger.Events.Items.Select(x => x.RenderMessage()));
+                    await clipboard.SetTextAsync(text);
+                }
             }
         });
     }

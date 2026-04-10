@@ -4,6 +4,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using FIFOCalculator.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Optris.Icons.Avalonia;
+using Optris.Icons.Avalonia.FontAwesome;
 using Serilog;
 using Zafiro.Avalonia.Controls.Shell;
 using Zafiro.Avalonia.Icons;
@@ -24,7 +26,8 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        IconControlProviderRegistry.Register(new ProjektankerIconControlProvider(), asDefault: true);
+        IconProvider.Current.Register<FontAwesomeIconProvider>();
+        IconControlProviderRegistry.Register(new OptrisIconControlProvider(), asDefault: true);
 
         var dynamicDataSink = new DynamicDataSink();
         Log.Logger = new LoggerConfiguration()
@@ -48,7 +51,7 @@ public partial class App : Application
                     // Resolve StorageProvider from the main window via ApplicationLifetime.
                     // TopLevel.GetTopLevel(view) is null here because the view isn't attached yet.
                     var desktop = (IClassicDesktopStyleApplicationLifetime)ApplicationLifetime!;
-                    return new AvaloniaFileSystemPicker(desktop.MainWindow!.StorageProvider);
+                    return new AvaloniaFileSystemPicker(() => desktop.MainWindow!.StorageProvider);
                 });
 
                 var provider = services.BuildServiceProvider();
