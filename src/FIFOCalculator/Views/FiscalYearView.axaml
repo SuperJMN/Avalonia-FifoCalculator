@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             mc:Ignorable="d" d:DesignHeight="450"
+             x:Class="FIFOCalculator.Views.FiscalYearView"
+             x:DataType="viewModels:FiscalYearViewModel"
+             x:CompileBindings="True" Padding="10">
+    <StackPanel Spacing="8">
+        <TextBlock Text="Calculate the FIFO balance for a complete fiscal year" />
+        <TextBlock Text="Inventory from prior years is carried forward automatically"
+                   FontStyle="Italic" Opacity="0.6" />
+        <HeaderedContentControl Header="Fiscal Year">
+            <ComboBox ItemsSource="{Binding AvailableYears}"
+                      SelectedItem="{Binding SelectedYear}" />
+        </HeaderedContentControl>
+        <StackPanel DataContext="{Binding Result^}"
+                    IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"
+                    Spacing="8">
+            <HeaderedContentControl Header="Gain / Loss">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding SoldValue, StringFormat='{}{0:C}'}" />
+            </HeaderedContentControl>
+            <HeaderedContentControl Header="Inventory value at year end">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding RemainingValue, StringFormat='{}{0:C}'}" />
+            </HeaderedContentControl>
+        </StackPanel>
+        <Button HorizontalAlignment="Center" Content="Calculate" Command="{Binding Calculate}" />
+    </StackPanel>
+</UserControl>
