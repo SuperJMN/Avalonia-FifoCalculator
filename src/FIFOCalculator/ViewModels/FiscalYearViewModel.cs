@@ -24,14 +24,10 @@ public partial class FiscalYearViewModel : ViewModelBase
         var inputs = dataEntry.Inputs;
         var outputs = dataEntry.Outputs;
         var inputEntries = inputs.EntriesCollection
-            .Select(list => list.OrderBy(entry => entry.When).ToList())
-            .Publish()
-            .RefCount();
+            .Select(list => list.OrderBy(entry => entry.When).ToList());
 
         var outputEntries = outputs.EntriesCollection
-            .Select(list => list.OrderBy(entry => entry.When).ToList())
-            .Publish()
-            .RefCount();
+            .Select(list => list.OrderBy(entry => entry.When).ToList());
 
         entries = inputEntries
             .CombineLatest(outputEntries, (ins, outs) => ins
