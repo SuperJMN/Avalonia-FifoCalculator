@@ -41,7 +41,7 @@ public partial class EntryEditorViewModel : ReactiveObject
 
         DeleteSelected = ReactiveCommand.Create(() => source.Remove(SelectedEntry!), this.WhenAnyValue(x => x.SelectedEntry).Select(x => x != null));
 
-        EntriesCollection = connected
+        EntriesCollection = source.Connect()
             .AutoRefreshOnObservable(vm => vm.WhenAnyValue(x => x.When, x => x.Units, x => x.PricePerUnit))
             .Transform(x => x.ToEntry())
             .ToCollection();

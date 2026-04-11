@@ -9,7 +9,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-		<PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.0-beta3" />
+		<PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
