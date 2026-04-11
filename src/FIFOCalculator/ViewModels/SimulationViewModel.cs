@@ -23,23 +23,22 @@ public partial class SimulationViewModel : ViewModelBase, ISimulationViewModel
     {
         var inputs = dataEntry.Inputs;
         var outputs = dataEntry.Outputs;
-        var inputEntries = inputs.EntriesCollection
-            .Select(list => list.OrderBy(entry => entry.When).ToList());
+        var entriesChanged = Observable.Merge(
+                inputs.EntriesCollection.Select(_ => Unit.Default),
+                outputs.EntriesCollection.Select(_ => Unit.Default))
+            .StartWith(Unit.Default);
 
-        var outputEntries = outputs.EntriesCollection
-            .Select(list => list.OrderBy(entry => entry.When).ToList());
-
-        entries = inputEntries
-            .CombineLatest(outputEntries, (ins, outs) => ins
-                .Concat(outs.Select(entry => entry with { Units = -entry.Units }))
+        entries = entriesChanged
+            .Select(_ => inputs.ToEntries()
+                .Concat(outputs.ToEntries().Select(entry => entry with { Units = -entry.Units }))
                 .OrderBy(entry => entry.When)
                 .ToList())
             .Select(list => (IReadOnlyList<Entry>)list)
             .ToProperty(this, model => model.Entries, new List<Entry>());
 
-        availableYears = inputEntries
-            .CombineLatest(outputEntries, (ins, outs) => ins.Concat(outs))
-            .Select(list => (IReadOnlyList<int>)list
+        availableYears = entriesChanged
+            .Select(_ => (IReadOnlyList<int>)inputs.ToEntries()
+                .Concat(outputs.ToEntries())
                 .Select(entry => entry.When.Year)
                 .Distinct()
                 .OrderBy(year => year)

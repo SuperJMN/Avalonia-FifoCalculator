@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\FIFOCalculator.Engine\FIFOCalculator.Engine.csproj" />
+    <ProjectReference Include="..\src\FIFOCalculator\FIFOCalculator.csproj" />
   </ItemGroup>
 
 </Project>
