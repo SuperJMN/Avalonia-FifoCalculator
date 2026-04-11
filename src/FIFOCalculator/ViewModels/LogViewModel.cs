@@ -12,7 +12,7 @@ using Zafiro.UI.Shell.Utils;
 
 namespace FIFOCalculator.ViewModels;
 
-[Section(icon: "fa-list", sortIndex: 2, FriendlyName = "Log")]
+[Section(icon: "fa-list", sortIndex: 3, FriendlyName = "Log")]
 public partial class LogViewModel : ViewModelBase
 {
     private readonly ReadOnlyObservableCollection<LogEntry> logEntries;
