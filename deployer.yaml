@@ -4,7 +4,9 @@ github:
   enabled: true
   owner: SuperJMN
   repo: FIFOCalculator
-  tokenEnvVar: GITHUB_TOKEN
+  token:
+    from: env
+    name: GITHUB_TOKEN
   packages:
     - project: src/FIFOCalculator.Android/FIFOCalculator.Android.csproj
       formats:
@@ -16,9 +18,13 @@ github:
               from: env
               name: ANDROID_KEYSTORE_BASE64
               encoding: base64
-            storePasswordEnvVar: ANDROID_SIGNING_STORE_PASS
+            storePassword:
+              from: env
+              name: ANDROID_SIGNING_STORE_PASS
             keyAlias: android
-            keyPasswordEnvVar: ANDROID_SIGNING_KEY_PASS
+            keyPassword:
+              from: env
+              name: ANDROID_SIGNING_KEY_PASS
 
     - project: src/FIFOCalculator.Desktop/FIFOCalculator.Desktop.csproj
       formats:
