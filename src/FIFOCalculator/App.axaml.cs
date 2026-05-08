@@ -16,6 +16,7 @@ using Zafiro.Avalonia.Services;
 using Zafiro.Avalonia.Storage;
 using Zafiro.UI;
 using Zafiro.UI.Shell;
+using Zafiro.UserStorage;
 
 namespace FIFOCalculator;
 
@@ -42,7 +43,11 @@ public partial class App : Application
 
         services.AddSingleton<INotificationService>(new NotificationService());
         services.AddSingleton<IObservableLogger>(dynamicDataSink);
-        services.AddSingleton<IEntryCatalogRepository>(_ => new JsonEntryCatalogRepository(logger: Log.Logger));
+        services.AddSingleton<IUserStorage>(_ => global::System.OperatingSystem.IsBrowser()
+            ? new BrowserLocalStorageUserStorage("FIFOCalculator")
+            : LocalUserStorage.ForApplication("FIFOCalculator"));
+        services.AddSingleton<IEntryCatalogRepository>(provider =>
+            new JsonEntryCatalogRepository(provider.GetRequiredService<IUserStorage>(), Log.Logger));
         services.AddSingleton(DialogService.Create());
         services.AddSingleton<DataEntryViewModel>();
         services.AddSingleton<SettingsViewModel>();

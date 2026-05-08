@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -8,11 +7,15 @@ using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using Serilog;
 using Zafiro.DivineBytes;
+using Zafiro.UserStorage;
+using Path = Zafiro.DivineBytes.Path;
 
 namespace FIFOCalculator.Persistence;
 
 public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
 {
+    private static readonly Path DatabaseKey = new(["database.json"]);
+
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -21,35 +24,57 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    private readonly string filePath;
+    private readonly IUserStorage storage;
     private readonly ILogger logger;
 
-    public JsonEntryCatalogRepository(string? filePath = null, ILogger? logger = null)
+    public JsonEntryCatalogRepository(IUserStorage storage, ILogger? logger = null)
     {
-        this.filePath = filePath ?? GetDefaultFilePath();
+        this.storage = storage;
         this.logger = logger ?? Log.Logger;
     }
 
     public async Task<Result<EntryCatalog>> Load()
     {
-        if (!File.Exists(filePath))
+        var result = await storage.Load(DatabaseKey);
+        if (result.IsFailure)
         {
-            return EmptyCatalog();
+            logger.Warning("Failed to load FIFO calculator database from storage key {Key}: {Error}", DatabaseKey, result.Error);
+            return Result.Failure<EntryCatalog>(result.Error);
         }
 
-        try
-        {
-            await using var stream = File.OpenRead(filePath);
-            return await Load(stream, filePath);
-        }
-        catch (Exception ex)
-        {
-            logger.Warning(ex, "Failed to load FIFO calculator database from {Path}", filePath);
-            return Result.Failure<EntryCatalog>(ex.Message);
-        }
+        return await result.Value.Match(
+            source => Load(source, DatabaseKey.Value),
+            () => Task.FromResult(Result.Success(EmptyCatalog())));
     }
 
     public async Task<Result<EntryCatalog>> Load(INamedByteSource source)
+    {
+        return await Load(source, source.Name);
+    }
+
+    public async Task<Result> Save(EntryCatalog catalog)
+    {
+        try
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(EntryCatalogDto.FromCatalog(catalog), SerializerOptions);
+            var result = await storage.Save(DatabaseKey, ByteSource.FromBytes(bytes));
+            if (result.IsFailure)
+            {
+                logger.Warning("Failed to save FIFO calculator database to storage key {Key}: {Error}", DatabaseKey, result.Error);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.Warning(ex, "Failed to save FIFO calculator database to storage key {Key}", DatabaseKey);
+            return Result.Failure(ex.Message);
+        }
+    }
+
+    private static EntryCatalog EmptyCatalog() => new([], []);
+
+    private async Task<Result<EntryCatalog>> Load(IByteSource source, string sourceName)
     {
         var bytes = await source.ReadAll();
         if (bytes.IsFailure)
@@ -57,53 +82,14 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
             return Result.Failure<EntryCatalog>(bytes.Error);
         }
 
-        await using var stream = new MemoryStream(bytes.Value);
-        return await Load(stream, source.Name);
-    }
-
-    public async Task<Result> Save(EntryCatalog catalog)
-    {
         try
         {
-            var directory = System.IO.Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrWhiteSpace(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            await using var stream = File.Create(filePath);
-            await JsonSerializer.SerializeAsync(stream, EntryCatalogDto.FromCatalog(catalog), SerializerOptions);
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            logger.Warning(ex, "Failed to save FIFO calculator database to {Path}", filePath);
-            return Result.Failure(ex.Message);
-        }
-    }
-
-    public static string GetDefaultFilePath()
-    {
-        var root = Environment.GetFolderPath(
-            OperatingSystem.IsAndroid()
-                ? Environment.SpecialFolder.Personal
-                : Environment.SpecialFolder.ApplicationData);
-
-        return System.IO.Path.Combine(root, "FIFOCalculator", "database.json");
-    }
-
-    private static EntryCatalog EmptyCatalog() => new([], []);
-
-    private async Task<Result<EntryCatalog>> Load(Stream stream, string source)
-    {
-        try
-        {
-            var dto = await JsonSerializer.DeserializeAsync<EntryCatalogDto>(stream, SerializerOptions);
+            var dto = JsonSerializer.Deserialize<EntryCatalogDto>(bytes.Value, SerializerOptions);
             return dto?.ToCatalog() ?? EmptyCatalog();
         }
         catch (Exception ex)
         {
-            logger.Warning(ex, "Failed to load FIFO calculator database from {Path}", source);
+            logger.Warning(ex, "Failed to load FIFO calculator database from {Source}", sourceName);
             return Result.Failure<EntryCatalog>(ex.Message);
         }
     }

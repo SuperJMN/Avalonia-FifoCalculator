@@ -2,24 +2,17 @@ using FIFOCalculator.Models;
 using FIFOCalculator.Persistence;
 using System.Text;
 using Zafiro.DivineBytes;
+using Zafiro.UserStorage;
+using Path = Zafiro.DivineBytes.Path;
 
 namespace TestProject1;
 
-public sealed class JsonEntryCatalogRepositoryTests : IDisposable
+public sealed class JsonEntryCatalogRepositoryTests
 {
-    private readonly string testDirectory;
-    private readonly string testFilePath;
-
-    public JsonEntryCatalogRepositoryTests()
-    {
-        testDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"fifo-calculator-test-{Guid.NewGuid():N}");
-        testFilePath = System.IO.Path.Combine(testDirectory, "database.json");
-    }
-
     [Fact]
-    public async Task Load_WhenFileDoesNotExist_ReturnsEmptyCatalog()
+    public async Task Load_WhenStorageKeyDoesNotExist_ReturnsEmptyCatalog()
     {
-        var sut = new JsonEntryCatalogRepository(testFilePath);
+        var sut = new JsonEntryCatalogRepository(new InMemoryUserStorage());
 
         var result = await sut.Load();
 
@@ -34,7 +27,7 @@ public sealed class JsonEntryCatalogRepositoryTests : IDisposable
         var catalog = new EntryCatalog(
             [new Entry(new DateTime(2026, 1, 10), 2, 100m)],
             [new Entry(new DateTime(2026, 2, 15), 1, 150m)]);
-        var sut = new JsonEntryCatalogRepository(testFilePath);
+        var sut = new JsonEntryCatalogRepository(new InMemoryUserStorage());
 
         var saveResult = await sut.Save(catalog);
         var loadResult = await sut.Load();
@@ -66,7 +59,7 @@ public sealed class JsonEntryCatalogRepositoryTests : IDisposable
                             }
                             """;
         var source = new Resource("import.json", ByteSource.FromBytes(Encoding.UTF8.GetBytes(json)));
-        var sut = new JsonEntryCatalogRepository(testFilePath);
+        var sut = new JsonEntryCatalogRepository(new InMemoryUserStorage());
 
         var result = await sut.Load(source);
 
@@ -77,22 +70,16 @@ public sealed class JsonEntryCatalogRepositoryTests : IDisposable
     }
 
     [Fact]
-    public void GetDefaultFilePath_UsesUserApplicationData()
+    public async Task Save_UsesLogicalStorageKey()
     {
-        var path = JsonEntryCatalogRepository.GetDefaultFilePath();
+        var storage = new InMemoryUserStorage();
+        var sut = new JsonEntryCatalogRepository(storage);
 
-        path.Should().EndWith(System.IO.Path.Combine("FIFOCalculator", "database.json"));
-        path.Should().Contain(Environment.GetFolderPath(
-            OperatingSystem.IsAndroid()
-                ? Environment.SpecialFolder.Personal
-                : Environment.SpecialFolder.ApplicationData));
-    }
+        var result = await sut.Save(new EntryCatalog([], []));
 
-    public void Dispose()
-    {
-        if (Directory.Exists(testDirectory))
-        {
-            Directory.Delete(testDirectory, recursive: true);
-        }
+        result.IsSuccess.Should().BeTrue();
+        var exists = await storage.Exists(new Path(["database.json"]));
+        exists.IsSuccess.Should().BeTrue();
+        exists.Value.Should().BeTrue();
     }
 }
