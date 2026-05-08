@@ -1,9 +1,13 @@
 trigger:
   - master
+  - main
 
 pr:
   branches:
-    include: [master, "*"]
+    include:
+      - master
+      - main
+      - "*"
 
 pool:
   vmImage: ubuntu-latest
@@ -23,27 +27,26 @@ steps:
   - task: UseDotNet@2
     displayName: 'Install .NET 10 SDK'
     inputs:
-      packageType: 'sdk'
-      version: '10.0.x'
+      packageType: sdk
+      version: '10.x'
 
-  # Dry run for PRs (no actual deployment)
+  - pwsh: dotnet tool install -g DotnetDeployer.Tool
+    displayName: Install DotnetDeployer
+
   - pwsh: |
-      dotnet tool install -g DotnetDeployer.Tool
       dotnetdeployer --dry-run
-    displayName: 'Dry run (PRs)'
-    condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Create release packages only (dry run)
+    condition: and(succeeded(), not(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))))
     env:
       GITHUB_TOKEN: $(GitHubApiKey)
       ANDROID_KEYSTORE_BASE64: $(AndroidBase64Keystore)
       ANDROID_SIGNING_STORE_PASS: $(AndroidSigningStorePass)
       ANDROID_SIGNING_KEY_PASS: $(AndroidSigningKeyPass)
 
-  # Actual deployment for master branch
   - pwsh: |
-      dotnet tool install -g DotnetDeployer.Tool
       dotnetdeployer
-    displayName: Deploy
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Create GitHub release packages
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')))
     env:
       GITHUB_TOKEN: $(GitHubApiKey)
       ANDROID_KEYSTORE_BASE64: $(AndroidBase64Keystore)
