@@ -1,6 +1,5 @@
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
-using FIFOCalculator.Persistence;
 using FIFOCalculator.ViewModels;
 using Zafiro.UI;
 
@@ -48,23 +47,10 @@ public class AvailableYearsViewModelTests
     }
 
     private static DataEntryViewModel CreateDataEntryViewModel() =>
-        new(new SilentNotificationService(), new InMemoryEntryCatalogRepository());
+        new();
 
     private sealed class SilentNotificationService : INotificationService
     {
         public Task Show(string message, Maybe<string> title) => Task.CompletedTask;
-    }
-
-    private sealed class InMemoryEntryCatalogRepository : IEntryCatalogRepository
-    {
-        private EntryCatalog catalog = new([], []);
-
-        public Task<Result<EntryCatalog>> Load() => Task.FromResult(Result.Success(catalog));
-
-        public Task<Result> Save(EntryCatalog entryCatalog)
-        {
-            catalog = entryCatalog;
-            return Task.FromResult(Result.Success());
-        }
     }
 }

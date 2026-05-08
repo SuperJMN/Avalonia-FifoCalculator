@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SettingsViewModel"
+             x:Class="FIFOCalculator.Views.SettingsView">
+
+    <StackPanel Margin="16" Spacing="12">
+        <TextBlock Text="Data" FontWeight="Bold" />
+        <EnhancedButton Content="Import data file"
+                        Classes="Secondary"
+                        Icon="{Icon fa-file-import}"
+                        Command="{Binding ImportDataFile}" />
+        <EnhancedButton Content="Clear data"
+                        Classes="Destructive"
+                        Icon="{Icon fa-trash}"
+                        Command="{Binding ClearData}" />
+    </StackPanel>
+</UserControl>

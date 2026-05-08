@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
 using Serilog;
+using Zafiro.DivineBytes;
 
 namespace FIFOCalculator.Persistence;
 
@@ -39,8 +40,7 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
         try
         {
             await using var stream = File.OpenRead(filePath);
-            var dto = await JsonSerializer.DeserializeAsync<EntryCatalogDto>(stream, SerializerOptions);
-            return dto?.ToCatalog() ?? EmptyCatalog();
+            return await Load(stream, filePath);
         }
         catch (Exception ex)
         {
@@ -49,11 +49,23 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
         }
     }
 
+    public async Task<Result<EntryCatalog>> Load(INamedByteSource source)
+    {
+        var bytes = await source.ReadAll();
+        if (bytes.IsFailure)
+        {
+            return Result.Failure<EntryCatalog>(bytes.Error);
+        }
+
+        await using var stream = new MemoryStream(bytes.Value);
+        return await Load(stream, source.Name);
+    }
+
     public async Task<Result> Save(EntryCatalog catalog)
     {
         try
         {
-            var directory = Path.GetDirectoryName(filePath);
+            var directory = System.IO.Path.GetDirectoryName(filePath);
             if (!string.IsNullOrWhiteSpace(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -77,10 +89,24 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
                 ? Environment.SpecialFolder.Personal
                 : Environment.SpecialFolder.ApplicationData);
 
-        return Path.Combine(root, "FIFOCalculator", "database.json");
+        return System.IO.Path.Combine(root, "FIFOCalculator", "database.json");
     }
 
     private static EntryCatalog EmptyCatalog() => new([], []);
+
+    private async Task<Result<EntryCatalog>> Load(Stream stream, string source)
+    {
+        try
+        {
+            var dto = await JsonSerializer.DeserializeAsync<EntryCatalogDto>(stream, SerializerOptions);
+            return dto?.ToCatalog() ?? EmptyCatalog();
+        }
+        catch (Exception ex)
+        {
+            logger.Warning(ex, "Failed to load FIFO calculator database from {Path}", source);
+            return Result.Failure<EntryCatalog>(ex.Message);
+        }
+    }
 
     private sealed record EntryCatalogDto
     {

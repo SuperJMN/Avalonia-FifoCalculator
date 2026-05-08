@@ -34,6 +34,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Zafiro.Avalonia" Version="52.0.3" />
+    <PackageReference Include="Zafiro.Avalonia.Dialogs" Version="52.0.3" />
     <PackageReference Include="Zafiro.Avalonia.Generators" Version="52.0.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

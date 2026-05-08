@@ -9,9 +9,11 @@ using Optris.Icons.Avalonia;
 using Optris.Icons.Avalonia.FontAwesome;
 using Serilog;
 using Zafiro.Avalonia.Controls.Shell;
+using Zafiro.Avalonia.Dialogs;
 using Zafiro.Avalonia.Icons;
 using Zafiro.Avalonia.Misc;
 using Zafiro.Avalonia.Services;
+using Zafiro.Avalonia.Storage;
 using Zafiro.UI;
 using Zafiro.UI.Shell;
 
@@ -41,14 +43,19 @@ public partial class App : Application
         services.AddSingleton<INotificationService>(new NotificationService());
         services.AddSingleton<IObservableLogger>(dynamicDataSink);
         services.AddSingleton<IEntryCatalogRepository>(_ => new JsonEntryCatalogRepository(logger: Log.Logger));
+        services.AddSingleton(DialogService.Create());
         services.AddSingleton<DataEntryViewModel>();
+        services.AddSingleton<SettingsViewModel>();
 
         this.Connect(
             () => new ShellView(),
-            _ =>
+            view =>
             {
+                services.AddSingleton<IFileSystemPicker>(_ =>
+                    new AvaloniaFileSystemPicker(() => TopLevel.GetTopLevel(view)!.StorageProvider));
+
                 var provider = services.BuildServiceProvider();
-                provider.GetRequiredService<DataEntryViewModel>().LoadStoreViewModel.Open.Execute().Subscribe(_ => { });
+                provider.GetRequiredService<SettingsViewModel>().LoadSavedData.Execute().Subscribe(_ => { });
                 return provider.GetRequiredService<IShell>();
             },
             () => new Window
