@@ -1,7 +1,8 @@
+using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using FIFOCalculator.Persistence;
 using FIFOCalculator.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Optris.Icons.Avalonia;
@@ -11,7 +12,6 @@ using Zafiro.Avalonia.Controls.Shell;
 using Zafiro.Avalonia.Icons;
 using Zafiro.Avalonia.Misc;
 using Zafiro.Avalonia.Services;
-using Zafiro.Avalonia.Storage;
 using Zafiro.UI;
 using Zafiro.UI.Shell;
 
@@ -40,21 +40,15 @@ public partial class App : Application
 
         services.AddSingleton<INotificationService>(new NotificationService());
         services.AddSingleton<IObservableLogger>(dynamicDataSink);
+        services.AddSingleton<IEntryCatalogRepository>(_ => new JsonEntryCatalogRepository(logger: Log.Logger));
         services.AddSingleton<DataEntryViewModel>();
 
         this.Connect(
             () => new ShellView(),
-            view =>
+            _ =>
             {
-                services.AddSingleton<IFileSystemPicker>(_ =>
-                {
-                    // Resolve StorageProvider from the main window via ApplicationLifetime.
-                    // TopLevel.GetTopLevel(view) is null here because the view isn't attached yet.
-                    var desktop = (IClassicDesktopStyleApplicationLifetime)ApplicationLifetime!;
-                    return new AvaloniaFileSystemPicker(() => desktop.MainWindow!.StorageProvider);
-                });
-
                 var provider = services.BuildServiceProvider();
+                provider.GetRequiredService<DataEntryViewModel>().LoadStoreViewModel.Open.Execute().Subscribe(_ => { });
                 return provider.GetRequiredService<IShell>();
             },
             () => new Window

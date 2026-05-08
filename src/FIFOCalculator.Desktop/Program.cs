@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using ReactiveUI.Avalonia;
 using System;
+using Zafiro.Avalonia.Mcp.AppHost;
 
 namespace FIFOCalculator.Desktop;
 
@@ -13,9 +14,10 @@ internal class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .UseMcpDiagnostics()
             .WithInterFont()
 #if DEBUG
             .WithDeveloperTools()
 #endif
-            .UseReactiveUI();
+            .UseReactiveUI(_ => { });
 }

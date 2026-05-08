@@ -1,4 +1,5 @@
-﻿using Zafiro.UI;
+﻿using FIFOCalculator.Persistence;
+using Zafiro.UI;
 using Zafiro.UI.Shell.Utils;
 
 namespace FIFOCalculator.ViewModels;
@@ -6,11 +7,11 @@ namespace FIFOCalculator.ViewModels;
 [Section(icon: "fa-table", sortIndex: 0, FriendlyName = "Data Entry")]
 public class DataEntryViewModel : ViewModelBase
 {
-    public DataEntryViewModel(INotificationService notificationService, IFileSystemPicker filePicker)
+    public DataEntryViewModel(INotificationService notificationService, IEntryCatalogRepository repository)
     {
         Inputs = new EntryEditorViewModel("Inputs");
         Outputs = new EntryEditorViewModel("Outputs");
-        LoadStoreViewModel = new LoadStoreViewModel(this, filePicker, notificationService);
+        LoadStoreViewModel = new LoadStoreViewModel(this, repository, notificationService);
     }
 
     public LoadStoreViewModel LoadStoreViewModel { get; set; }

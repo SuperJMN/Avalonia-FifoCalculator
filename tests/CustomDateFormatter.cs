@@ -11,16 +11,21 @@ class CustomDateFormatter : IFormatProvider
         this.shortDatePattern = shortDatePattern;
         this.basedOn = basedOn;
     }
-    public object GetFormat(Type formatType)
+    public object? GetFormat(Type? formatType)
     {
         if (formatType == typeof(DateTimeFormatInfo))
         {
-            var basedOnFormatInfo = (DateTimeFormatInfo)basedOn.GetFormat(formatType);
+            var basedOnFormatInfo = (DateTimeFormatInfo?)basedOn.GetFormat(formatType);
+            if (basedOnFormatInfo is null)
+            {
+                return null;
+            }
+
             var dateFormatInfo = (DateTimeFormatInfo)basedOnFormatInfo.Clone();
-            dateFormatInfo.ShortDatePattern = this.shortDatePattern;
+            dateFormatInfo.ShortDatePattern = shortDatePattern;
             return dateFormatInfo;
         }
-        return this.basedOn.GetFormat(formatType);
+
+        return basedOn.GetFormat(formatType);
     }
 }
-    

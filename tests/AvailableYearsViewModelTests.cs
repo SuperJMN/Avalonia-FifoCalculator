@@ -1,8 +1,7 @@
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
+using FIFOCalculator.Persistence;
 using FIFOCalculator.ViewModels;
-using Zafiro.DivineBytes;
-using Zafiro.FileSystem.Mutable;
 using Zafiro.UI;
 
 namespace TestProject1;
@@ -49,25 +48,23 @@ public class AvailableYearsViewModelTests
     }
 
     private static DataEntryViewModel CreateDataEntryViewModel() =>
-        new(new SilentNotificationService(), new DummyFileSystemPicker());
+        new(new SilentNotificationService(), new InMemoryEntryCatalogRepository());
 
     private sealed class SilentNotificationService : INotificationService
     {
         public Task Show(string message, Maybe<string> title) => Task.CompletedTask;
     }
 
-    private sealed class DummyFileSystemPicker : IFileSystemPicker
+    private sealed class InMemoryEntryCatalogRepository : IEntryCatalogRepository
     {
-        public Task<Result<Maybe<INamedByteSource>>> PickForOpen(params FileTypeFilter[] filters) =>
-            throw new NotSupportedException();
+        private EntryCatalog catalog = new([], []);
 
-        public Task<Result<IEnumerable<INamedByteSource>>> PickForOpenMultiple(params FileTypeFilter[] filters) =>
-            throw new NotSupportedException();
+        public Task<Result<EntryCatalog>> Load() => Task.FromResult(Result.Success(catalog));
 
-        public Task<Maybe<IMutableFile>> PickForSave(string desiredName, Maybe<string> defaultExtension, params FileTypeFilter[] filters) =>
-            throw new NotSupportedException();
-
-        public Task<Maybe<IMutableDirectory>> PickFolder() =>
-            throw new NotSupportedException();
+        public Task<Result> Save(EntryCatalog entryCatalog)
+        {
+            catalog = entryCatalog;
+            return Task.FromResult(Result.Success());
+        }
     }
 }

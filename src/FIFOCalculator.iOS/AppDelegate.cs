@@ -2,8 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.iOS;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
 using Foundation;
+using ReactiveUI.Avalonia;
 using UIKit;
 
 namespace FIFOCalculator.iOS
@@ -16,7 +16,7 @@ namespace FIFOCalculator.iOS
     {
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
         {
-            return builder.UseReactiveUI();
+            return builder.UseReactiveUI(_ => { });
         }
     }
 }
