@@ -7,15 +7,56 @@
              x:DataType="viewModels:SettingsViewModel"
              x:Class="FIFOCalculator.Views.SettingsView">
 
-    <StackPanel Margin="16" Spacing="12">
+    <StackPanel Margin="16" Spacing="16">
         <TextBlock Text="Data" FontWeight="Bold" />
-        <EnhancedButton Content="Import data file"
-                        Classes="Secondary"
-                        Icon="{Icon fa-file-import}"
-                        Command="{Binding ImportDataFile}" />
-        <EnhancedButton Content="Clear data"
-                        Classes="Destructive"
-                        Icon="{Icon fa-trash}"
-                        Command="{Binding ClearData}" />
+        <StackPanel Spacing="8">
+            <EnhancedButton Content="Import data file"
+                            Classes="Secondary"
+                            Icon="{Icon fa-file-import}"
+                            Command="{Binding ImportDataFile}" />
+            <EnhancedButton Content="Clear data"
+                            Classes="Destructive"
+                            Icon="{Icon fa-trash}"
+                            Command="{Binding ClearData}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8" IsVisible="{Binding IsSyncSupported}">
+            <TextBlock Text="Sync" FontWeight="Bold" />
+            <TextBlock Text="{Binding SyncStatusLine}" TextWrapping="Wrap" />
+            <EnhancedButton Content="Create identity"
+                            IsVisible="{Binding CanCreateSyncIdentity}"
+                            Classes="Primary"
+                            Icon="{Icon fa-plus}"
+                            Command="{Binding CreateSyncIdentity}" />
+            <EnhancedButton Content="Unlock"
+                            IsVisible="{Binding CanUnlockSync}"
+                            Classes="Primary"
+                            Icon="{Icon fa-lock-open}"
+                            Command="{Binding UnlockSync}" />
+            <EnhancedButton Content="Import identity"
+                            Classes="Secondary"
+                            Icon="{Icon fa-file-import}"
+                            Command="{Binding ImportSyncIdentity}" />
+            <EnhancedButton Content="Export identity"
+                            IsVisible="{Binding CanExportSyncIdentity}"
+                            Classes="Secondary"
+                            Icon="{Icon fa-file-export}"
+                            Command="{Binding ExportSyncIdentity}" />
+            <EnhancedButton Content="Sync now"
+                            IsVisible="{Binding CanSyncNow}"
+                            Classes="Secondary"
+                            Icon="{Icon fa-arrows-rotate}"
+                            Command="{Binding SyncNow}" />
+            <EnhancedButton Content="Resolve conflict"
+                            IsVisible="{Binding HasSyncConflict}"
+                            Classes="Primary"
+                            Icon="{Icon fa-triangle-exclamation}"
+                            Command="{Binding ResolveSyncConflict}" />
+            <EnhancedButton Content="Disconnect"
+                            IsVisible="{Binding CanDisconnectSync}"
+                            Classes="Destructive"
+                            Icon="{Icon fa-link-slash}"
+                            Command="{Binding DisconnectSync}" />
+        </StackPanel>
     </StackPanel>
 </UserControl>

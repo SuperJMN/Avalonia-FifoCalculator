@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using FIFOCalculator.Desktop.Sync;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Avalonia;
 using System;
 using Zafiro.Avalonia.Mcp.AppHost;
@@ -12,7 +14,10 @@ internal class Program
         .StartWithClassicDesktopLifetime(args);
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        App.ConfigureHostServices = services => services.AddFifoDesktopSync();
+
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .UseMcpDiagnostics()
             .WithInterFont()
@@ -20,4 +25,5 @@ internal class Program
             .WithDeveloperTools()
 #endif
             .UseReactiveUI(_ => { });
+    }
 }

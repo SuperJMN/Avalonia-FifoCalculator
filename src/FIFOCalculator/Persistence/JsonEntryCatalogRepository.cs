@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FIFOCalculator.Models;
@@ -15,14 +12,6 @@ namespace FIFOCalculator.Persistence;
 public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
 {
     private static readonly Path DatabaseKey = new(["database.json"]);
-
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
 
     private readonly IUserStorage storage;
     private readonly ILogger logger;
@@ -56,7 +45,7 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
     {
         try
         {
-            var bytes = JsonSerializer.SerializeToUtf8Bytes(EntryCatalogDto.FromCatalog(catalog), SerializerOptions);
+            var bytes = EntryCatalogJson.ToBytes(catalog);
             var result = await storage.Save(DatabaseKey, ByteSource.FromBytes(bytes));
             if (result.IsFailure)
             {
@@ -72,7 +61,7 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
         }
     }
 
-    private static EntryCatalog EmptyCatalog() => new([], []);
+    private static EntryCatalog EmptyCatalog() => EntryCatalogJson.EmptyCatalog();
 
     private async Task<Result<EntryCatalog>> Load(IByteSource source, string sourceName)
     {
@@ -82,29 +71,12 @@ public sealed class JsonEntryCatalogRepository : IEntryCatalogRepository
             return Result.Failure<EntryCatalog>(bytes.Error);
         }
 
-        try
+        var catalog = EntryCatalogJson.FromBytes(bytes.Value);
+        if (catalog.IsFailure)
         {
-            var dto = JsonSerializer.Deserialize<EntryCatalogDto>(bytes.Value, SerializerOptions);
-            return dto?.ToCatalog() ?? EmptyCatalog();
+            logger.Warning("Failed to load FIFO calculator database from {Source}: {Error}", sourceName, catalog.Error);
         }
-        catch (Exception ex)
-        {
-            logger.Warning(ex, "Failed to load FIFO calculator database from {Source}", sourceName);
-            return Result.Failure<EntryCatalog>(ex.Message);
-        }
-    }
 
-    private sealed record EntryCatalogDto
-    {
-        public List<Entry> Inputs { get; init; } = [];
-        public List<Entry> Outputs { get; init; } = [];
-
-        public static EntryCatalogDto FromCatalog(EntryCatalog catalog) => new()
-        {
-            Inputs = catalog.Inputs,
-            Outputs = catalog.Outputs
-        };
-
-        public EntryCatalog ToCatalog() => new(Inputs, Outputs);
+        return catalog;
     }
 }

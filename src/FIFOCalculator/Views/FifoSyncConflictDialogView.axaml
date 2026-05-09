@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="180"
+             x:DataType="viewModels:FifoSyncConflictDialogViewModel"
+             x:Class="FIFOCalculator.Views.FifoSyncConflictDialogView">
+    <StackPanel Spacing="12">
+        <TextBlock Text="Both the local and remote databases have changes."
+                   TextWrapping="Wrap" />
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <HeaderedContentControl Header="Local">
+                <TextBlock Text="{Binding LocalSummary}" TextWrapping="Wrap" />
+            </HeaderedContentControl>
+            <HeaderedContentControl Grid.Column="1" Header="Remote">
+                <TextBlock Text="{Binding RemoteSummary}" TextWrapping="Wrap" />
+            </HeaderedContentControl>
+        </Grid>
+    </StackPanel>
+</UserControl>

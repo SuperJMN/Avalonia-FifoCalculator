@@ -1,8 +1,10 @@
+using System;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FIFOCalculator.Persistence;
+using FIFOCalculator.Sync;
 using FIFOCalculator.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Optris.Icons.Avalonia;
@@ -22,6 +24,8 @@ namespace FIFOCalculator;
 
 public partial class App : Application
 {
+    public static Action<IServiceCollection>? ConfigureHostServices { get; set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -48,9 +52,11 @@ public partial class App : Application
             : LocalUserStorage.ForApplication("FIFOCalculator"));
         services.AddSingleton<IEntryCatalogRepository>(provider =>
             new JsonEntryCatalogRepository(provider.GetRequiredService<IUserStorage>(), Log.Logger));
+        services.AddSingleton<IFifoSyncService, NoOpFifoSyncService>();
         services.AddSingleton(DialogService.Create());
         services.AddSingleton<DataEntryViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        ConfigureHostServices?.Invoke(services);
 
         this.Connect(
             () => new ShellView(),
@@ -60,7 +66,10 @@ public partial class App : Application
                     new AvaloniaFileSystemPicker(() => TopLevel.GetTopLevel(view)!.StorageProvider));
 
                 var provider = services.BuildServiceProvider();
-                provider.GetRequiredService<SettingsViewModel>().LoadSavedData.Execute().Subscribe(_ => { });
+                provider.GetRequiredService<IFifoSyncService>().Initialize().GetAwaiter().GetResult();
+                System.ObservableExtensions.Subscribe(
+                    provider.GetRequiredService<SettingsViewModel>().LoadSavedData.Execute(),
+                    _ => { });
                 return provider.GetRequiredService<IShell>();
             },
             () => new Window
