@@ -28,6 +28,7 @@ public class SettingsViewModel : ViewModelBase
     private string syncStatusLine = "Sync is not configured.";
     private bool isSyncSupported;
     private bool canCreateSyncIdentity;
+    private bool canImportSyncIdentity;
     private bool canUnlockSync;
     private bool canExportSyncIdentity;
     private bool canSyncNow;
@@ -291,6 +292,12 @@ public class SettingsViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref canCreateSyncIdentity, value);
     }
 
+    public bool CanImportSyncIdentity
+    {
+        get => canImportSyncIdentity;
+        private set => this.RaiseAndSetIfChanged(ref canImportSyncIdentity, value);
+    }
+
     public bool CanUnlockSync
     {
         get => canUnlockSync;
@@ -398,13 +405,15 @@ public class SettingsViewModel : ViewModelBase
 
     private void ApplySyncStatus(FifoSyncStatus status)
     {
+        var syncReady = status.IsSupported && status.IsReady;
         SyncStatusLine = status.Message;
         IsSyncSupported = status.IsSupported;
-        CanCreateSyncIdentity = status.IsSupported && !status.HasIdentity;
-        CanUnlockSync = status.IsSupported && status.HasIdentity && !status.IsUnlocked;
-        CanExportSyncIdentity = status.IsSupported && status.HasIdentity;
-        CanSyncNow = status.IsSupported && status.IsUnlocked && !status.HasConflict;
-        CanDisconnectSync = status.IsSupported && status.HasIdentity;
-        HasSyncConflict = status.IsSupported && status.HasConflict;
+        CanCreateSyncIdentity = syncReady && !status.HasIdentity;
+        CanImportSyncIdentity = syncReady;
+        CanUnlockSync = syncReady && status.HasIdentity && !status.IsUnlocked;
+        CanExportSyncIdentity = syncReady && status.HasIdentity;
+        CanSyncNow = syncReady && status.IsUnlocked && !status.HasConflict;
+        CanDisconnectSync = syncReady && status.HasIdentity;
+        HasSyncConflict = syncReady && status.HasConflict;
     }
 }

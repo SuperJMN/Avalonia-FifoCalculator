@@ -36,6 +36,7 @@
             <EnhancedButton Content="Import identity"
                             Classes="Secondary"
                             Icon="{Icon fa-file-import}"
+                            IsEnabled="{Binding CanImportSyncIdentity}"
                             Command="{Binding ImportSyncIdentity}" />
             <EnhancedButton Content="Export identity"
                             IsVisible="{Binding CanExportSyncIdentity}"

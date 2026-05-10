@@ -111,6 +111,27 @@ public sealed class SettingsViewModelTests
         dataEntry.Inputs.ToEntries().Should().BeEquivalentTo(downloaded.Inputs);
     }
 
+    [Fact]
+    public void SyncActions_WhenSyncIsNotReady_ShouldRemainDisabled()
+    {
+        var sync = new FakeFifoSyncService(
+            new FifoSyncStatus(true, false, false, false, false, false, null, "Sync is initializing.", null));
+        var sut = CreateSut(new DataEntryViewModel(), new FakeEntryCatalogRepository(), syncService: sync);
+
+        sut.CanCreateSyncIdentity.Should().BeFalse();
+        sut.CanImportSyncIdentity.Should().BeFalse();
+        sut.CanUnlockSync.Should().BeFalse();
+        sut.CanExportSyncIdentity.Should().BeFalse();
+        sut.CanSyncNow.Should().BeFalse();
+        sut.CanDisconnectSync.Should().BeFalse();
+        sut.HasSyncConflict.Should().BeFalse();
+
+        sync.SetStatus(new FifoSyncStatus(true, true, false, false, false, false, null, "Sync is not configured.", null));
+
+        sut.CanCreateSyncIdentity.Should().BeTrue();
+        sut.CanImportSyncIdentity.Should().BeTrue();
+    }
+
     private static SettingsViewModel CreateSut(
         DataEntryViewModel dataEntry,
         FakeEntryCatalogRepository repository,
@@ -153,12 +174,27 @@ public sealed class SettingsViewModelTests
 
     private sealed class FakeFifoSyncService : IFifoSyncService
     {
-        private readonly BehaviorSubject<FifoSyncStatus> status = new(new FifoSyncStatus(true, false, false, false, false, null, "Sync is not configured.", null));
+        private readonly BehaviorSubject<FifoSyncStatus> status;
         public Action? OnUnlock { get; init; }
+
+        public FakeFifoSyncService()
+            : this(new FifoSyncStatus(true, true, false, false, false, false, null, "Sync is not configured.", null))
+        {
+        }
+
+        public FakeFifoSyncService(FifoSyncStatus initialStatus)
+        {
+            status = new BehaviorSubject<FifoSyncStatus>(initialStatus);
+        }
 
         public FifoSyncStatus Status => status.Value;
 
         public IObservable<FifoSyncStatus> StatusChanged => status;
+
+        public void SetStatus(FifoSyncStatus value)
+        {
+            status.OnNext(value);
+        }
 
         public Task<Result> Initialize(CancellationToken cancellationToken = default) => Task.FromResult(Result.Success());
 

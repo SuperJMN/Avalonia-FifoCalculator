@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Xaml.Behaviors.Interactivity"
+             xmlns:core="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Xaml.Behaviors.Interactions"
+             xmlns:custom="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Xaml.Behaviors.Interactions.Custom"
+             xmlns:shell="clr-namespace:Zafiro.Avalonia.Controls.Shell;assembly=Zafiro.Avalonia"
+             xmlns:viewModels="clr-namespace:FIFOCalculator.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="viewModels:AppViewModel"
+             x:Class="FIFOCalculator.Views.AppView">
+
+    <i:Interaction.Behaviors>
+        <custom:DataContextChangedTrigger>
+            <core:InvokeCommandAction Command="{Binding Initialize}" />
+        </custom:DataContextChangedTrigger>
+        <custom:LoadedTrigger>
+            <core:InvokeCommandAction Command="{Binding Initialize}" />
+        </custom:LoadedTrigger>
+    </i:Interaction.Behaviors>
+
+    <shell:ShellView DataContext="{Binding Shell}" />
+</UserControl>

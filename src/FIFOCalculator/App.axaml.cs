@@ -1,17 +1,16 @@
 using System;
-using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FIFOCalculator.Persistence;
 using FIFOCalculator.Sync;
 using FIFOCalculator.ViewModels;
+using FIFOCalculator.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Optris.Icons.Avalonia;
 using Optris.Icons.Avalonia.FontAwesome;
 using Optris.Icons.Avalonia.MaterialDesign;
 using Serilog;
-using Zafiro.Avalonia.Controls.Shell;
 using Zafiro.Avalonia.Dialogs;
 using Zafiro.Avalonia.Icons;
 using Zafiro.Avalonia.Misc;
@@ -47,6 +46,7 @@ public partial class App : Application
         services.AddZafiroShell(logger: Log.Logger);
         services.AddAllSectionsFromAttributes(Log.Logger);
 
+        services.AddSingleton(Log.Logger);
         services.AddSingleton<INotificationService>(new NotificationService());
         services.AddSingleton<IObservableLogger>(dynamicDataSink);
         services.AddSingleton<IUserStorage>(_ => global::System.OperatingSystem.IsBrowser()
@@ -59,20 +59,17 @@ public partial class App : Application
         services.AddSingleton<DataEntryViewModel>();
         services.AddSingleton<SettingsViewModel>();
         ConfigureHostServices?.Invoke(services);
+        services.AddSingleton<AppViewModel>();
 
         this.Connect(
-            () => new ShellView(),
+            () => new AppView(),
             view =>
             {
                 services.AddSingleton<IFileSystemPicker>(_ =>
                     new AvaloniaFileSystemPicker(() => TopLevel.GetTopLevel(view)!.StorageProvider));
 
                 var provider = services.BuildServiceProvider();
-                FifoSyncStartup.Start(provider.GetRequiredService<IFifoSyncService>(), Log.Logger);
-                System.ObservableExtensions.Subscribe(
-                    provider.GetRequiredService<SettingsViewModel>().LoadSavedData.Execute(),
-                    _ => { });
-                return provider.GetRequiredService<IShell>();
+                return provider.GetRequiredService<AppViewModel>();
             },
             () => new Window
             {

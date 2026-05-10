@@ -11,6 +11,23 @@ namespace TestProject1;
 public sealed class FifoSyncServiceTests
 {
     [Fact]
+    public async Task Initialize_WhenNoStoredIdentity_ShouldMarkSyncReadyWithoutIdentity()
+    {
+        var storage = new InMemoryUserStorage();
+        var remote = new FakeRemoteCatalogClient();
+        var sut = CreateSut(storage, remote);
+
+        sut.Status.IsReady.Should().BeFalse();
+
+        var result = await sut.Initialize();
+
+        result.IsSuccess.Should().BeTrue();
+        sut.Status.IsReady.Should().BeTrue();
+        sut.Status.HasIdentity.Should().BeFalse();
+        sut.Status.Message.Should().Be("Sync is not configured.");
+    }
+
+    [Fact]
     public async Task CreateIdentity_WhenRemoteIsEmpty_ShouldStoreIdentityAndUploadLocalCatalog()
     {
         var catalog = Catalog(1, 100m);

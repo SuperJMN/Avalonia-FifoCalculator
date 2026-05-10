@@ -28,7 +28,6 @@ public sealed class FifoSyncService : IFifoSyncService
     private readonly IFifoRemoteCatalogClientFactory remoteCatalogClientFactory;
     private readonly ILogger logger;
     private readonly BehaviorSubject<FifoSyncStatus> statusChanged;
-    private readonly SemaphoreSlim initializationGate = new(1, 1);
     private FifoSyncState state = new();
     private IFifoSyncIdentity? identity;
     private IFifoRemoteCatalogClient? remoteCatalogClient;
@@ -48,7 +47,7 @@ public sealed class FifoSyncService : IFifoSyncService
         this.remoteCatalogClientFactory = remoteCatalogClientFactory;
         this.logger = logger ?? Log.Logger;
 
-        Status = new FifoSyncStatus(true, false, false, false, false, null, "Sync is not configured.", null);
+        Status = new FifoSyncStatus(true, false, false, false, false, false, null, "Sync is initializing.", null);
         statusChanged = new BehaviorSubject<FifoSyncStatus>(Status);
     }
 
@@ -63,36 +62,23 @@ public sealed class FifoSyncService : IFifoSyncService
             return Result.Success();
         }
 
-        await initializationGate.WaitAsync(cancellationToken);
-        try
+        var stateResult = await LoadState(cancellationToken);
+        if (stateResult.IsFailure)
         {
-            if (initialized)
-            {
-                return Result.Success();
-            }
-
-            var stateResult = await LoadState(cancellationToken);
-            if (stateResult.IsFailure)
-            {
-                return Result.Failure(stateResult.Error);
-            }
-
-            var exists = await storage.Exists(FifoSyncDefaults.IdentityKey, cancellationToken);
-            if (exists.IsFailure)
-            {
-                return Result.Failure(exists.Error);
-            }
-
-            state = stateResult.Value;
-            hasStoredIdentity = exists.Value;
-            initialized = true;
-            Publish();
-            return Result.Success();
+            return Result.Failure(stateResult.Error);
         }
-        finally
+
+        var exists = await storage.Exists(FifoSyncDefaults.IdentityKey, cancellationToken);
+        if (exists.IsFailure)
         {
-            initializationGate.Release();
+            return Result.Failure(exists.Error);
         }
+
+        state = stateResult.Value;
+        hasStoredIdentity = exists.Value;
+        initialized = true;
+        Publish();
+        return Result.Success();
     }
 
     public async Task<Result> CreateIdentity(string password, EntryCatalog localCatalog, CancellationToken cancellationToken = default)
@@ -639,6 +625,7 @@ public sealed class FifoSyncService : IFifoSyncService
     {
         Status = new FifoSyncStatus(
             true,
+            initialized,
             hasStoredIdentity,
             identity is not null,
             isSyncing,

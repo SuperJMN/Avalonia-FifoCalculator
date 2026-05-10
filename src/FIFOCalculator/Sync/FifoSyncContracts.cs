@@ -37,6 +37,7 @@ public interface IFifoSyncService
 
 public sealed record FifoSyncStatus(
     bool IsSupported,
+    bool IsReady,
     bool HasIdentity,
     bool IsUnlocked,
     bool IsSyncing,
@@ -49,7 +50,7 @@ public sealed record FifoSyncStatus(
 
     public static FifoSyncStatus Unsupported(string message)
     {
-        return new FifoSyncStatus(false, false, false, false, false, null, message, null);
+        return new FifoSyncStatus(false, true, false, false, false, false, null, message, null);
     }
 }
 
