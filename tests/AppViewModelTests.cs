@@ -29,9 +29,12 @@ public sealed class AppViewModelTests
         var settings = CreateSettings(dataEntry, repository, sync);
         var sut = CreateSut(sync, settings);
 
+        sut.IsInitializing.Should().BeTrue();
+
         var result = await sut.Initialize.Execute().ToTask();
 
         result.IsSuccess.Should().BeTrue();
+        sut.IsInitializing.Should().BeFalse();
         sync.InitializeCalls.Should().Be(1);
         repository.LoadCalls.Should().Be(1);
         dataEntry.Inputs.ToEntries().Should().BeEquivalentTo(catalog.Inputs);
@@ -47,8 +50,11 @@ public sealed class AppViewModelTests
         var sut = CreateSut(sync, settings);
 
         await sut.Initialize.Execute().ToTask();
+        sut.IsInitializing.Should().BeFalse();
+
         await sut.Initialize.Execute().ToTask();
 
+        sut.IsInitializing.Should().BeFalse();
         sync.InitializeCalls.Should().Be(1);
         repository.LoadCalls.Should().Be(1);
     }
@@ -66,9 +72,12 @@ public sealed class AppViewModelTests
         var sink = new CapturingSink();
         var sut = CreateSut(sync, settings, new LoggerConfiguration().WriteTo.Sink(sink).CreateLogger());
 
+        sut.IsInitializing.Should().BeTrue();
+
         var result = await sut.Initialize.Execute().ToTask();
 
         result.IsSuccess.Should().BeTrue();
+        sut.IsInitializing.Should().BeFalse();
         sync.InitializeCalls.Should().Be(1);
         repository.LoadCalls.Should().Be(1);
         dataEntry.Inputs.ToEntries().Should().BeEquivalentTo(catalog.Inputs);
@@ -84,16 +93,20 @@ public sealed class AppViewModelTests
         var settings = CreateSettings(new DataEntryViewModel(), repository, sync);
         var sut = CreateSut(sync, settings);
 
+        sut.IsInitializing.Should().BeTrue();
+
         var initialize = sut.Initialize.Execute().ToTask();
 
         await sync.InitializeStarted.Task.WaitAsync(TimeSpan.FromSeconds(1));
         await repository.LoadStarted.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        sut.IsInitializing.Should().BeTrue();
         initialize.IsCompleted.Should().BeFalse();
 
         initialization.SetResult(Result.Success());
         var result = await initialize.WaitAsync(TimeSpan.FromSeconds(1));
 
         result.IsSuccess.Should().BeTrue();
+        sut.IsInitializing.Should().BeFalse();
     }
 
     private static AppViewModel CreateSut(FakeFifoSyncService sync, SettingsViewModel settings, ILogger? logger = null)

@@ -37,7 +37,7 @@ public class MainApplication : AvaloniaAndroidApplication<App>
 
 [Activity(
     Label = "FIFO Calculator",
-    Theme = "@style/MyTheme.NoActionBar",
+    Theme = "@style/MyTheme.Splash",
     Icon = "@drawable/icon",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]

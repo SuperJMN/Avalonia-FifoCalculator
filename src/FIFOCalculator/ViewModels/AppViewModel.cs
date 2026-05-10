@@ -16,6 +16,7 @@ public sealed class AppViewModel : ViewModelBase
     private readonly IFifoSyncService syncService;
     private readonly SettingsViewModel settingsViewModel;
     private readonly ILogger logger;
+    private bool isInitializing = true;
     private int initialized;
 
     public AppViewModel(IShell shell, IFifoSyncService syncService, SettingsViewModel settingsViewModel, ILogger? logger = null)
@@ -29,6 +30,12 @@ public sealed class AppViewModel : ViewModelBase
 
     public IShell Shell { get; }
 
+    public bool IsInitializing
+    {
+        get => isInitializing;
+        private set => this.RaiseAndSetIfChanged(ref isInitializing, value);
+    }
+
     public ReactiveCommand<Unit, Result> Initialize { get; }
 
     private async Task<Result> InitializeOnce()
@@ -38,11 +45,18 @@ public sealed class AppViewModel : ViewModelBase
             return Result.Success();
         }
 
-        var sync = InitializeSync();
-        var load = await settingsViewModel.LoadSavedData.Execute().ToTask();
-        await sync;
+        try
+        {
+            var sync = InitializeSync();
+            var load = await settingsViewModel.LoadSavedData.Execute().ToTask();
+            await sync;
 
-        return load.IsFailure ? Result.Failure(load.Error) : Result.Success();
+            return load.IsFailure ? Result.Failure(load.Error) : Result.Success();
+        }
+        finally
+        {
+            IsInitializing = false;
+        }
     }
 
     private async Task InitializeSync()

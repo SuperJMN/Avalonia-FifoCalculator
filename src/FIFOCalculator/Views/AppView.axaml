@@ -20,5 +20,15 @@
         </custom:LoadedTrigger>
     </i:Interaction.Behaviors>
 
-    <shell:ShellView DataContext="{Binding Shell}" />
+    <Border>
+        <Border.Background>
+            <SolidColorBrush Color="{DynamicResource SoftBackground}" />
+        </Border.Background>
+
+        <Loading IsLoading="{Binding IsInitializing}"
+                 LoadingText="Starting FIFO Calculator..."
+                 ProgressIndicatorSize="64">
+            <shell:ShellView DataContext="{Binding Shell}" />
+        </Loading>
+    </Border>
 </UserControl>
