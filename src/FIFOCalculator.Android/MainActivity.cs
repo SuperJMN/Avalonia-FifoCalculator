@@ -4,7 +4,11 @@ using Android.Content.PM;
 using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
+using FIFOCalculator.Sync.Zafiro;
 using ReactiveUI.Avalonia;
+#if DEBUG
+using Zafiro.Avalonia.Mcp.AppHost;
+#endif
 
 namespace FIFOCalculator.Android;
 
@@ -18,9 +22,16 @@ public class MainApplication : AvaloniaAndroidApplication<App>
 
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
-        return base.CustomizeAppBuilder(builder)
-            .WithInterFont()
-            .UseReactiveUI(_ => { });
+        App.ConfigureHostServices = services => services.AddFifoZafiroSync();
+
+        var appBuilder = base.CustomizeAppBuilder(builder)
+            .WithInterFont();
+
+#if DEBUG
+        appBuilder = appBuilder.UseMcpDiagnostics();
+#endif
+
+        return appBuilder.UseReactiveUI(_ => { });
     }
 }
 

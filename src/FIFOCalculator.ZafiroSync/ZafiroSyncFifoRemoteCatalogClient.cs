@@ -3,9 +3,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Zafiro.Sync.Client;
-using FIFOCalculator.Sync;
 
-namespace FIFOCalculator.Desktop.Sync;
+namespace FIFOCalculator.Sync.Zafiro;
 
 public sealed class ZafiroSyncFifoRemoteCatalogClientFactory : IFifoRemoteCatalogClientFactory
 {

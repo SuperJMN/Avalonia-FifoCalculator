@@ -1,10 +1,9 @@
 using System;
 using System.Linq;
-using Zafiro.Sync.Client;
 using CSharpFunctionalExtensions;
-using FIFOCalculator.Sync;
+using Zafiro.Sync.Client;
 
-namespace FIFOCalculator.Desktop.Sync;
+namespace FIFOCalculator.Sync.Zafiro;
 
 public sealed class ZafiroSyncFifoSyncIdentityProvider : IFifoSyncIdentityProvider
 {

@@ -15,6 +15,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="..\FIFOCalculator.ZafiroSync\*.cs" Link="Sync\%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\FIFOCalculator\FIFOCalculator.csproj" />
 	</ItemGroup>
 </Project>

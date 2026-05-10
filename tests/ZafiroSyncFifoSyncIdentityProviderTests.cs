@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
-using FIFOCalculator.Desktop.Sync;
 using FIFOCalculator.Sync;
+using FIFOCalculator.Sync.Zafiro;
 
 namespace TestProject1;
 

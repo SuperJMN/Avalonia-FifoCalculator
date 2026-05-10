@@ -1,14 +1,13 @@
 using FIFOCalculator.Persistence;
-using FIFOCalculator.Sync;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Zafiro.UserStorage;
 
-namespace FIFOCalculator.Desktop.Sync;
+namespace FIFOCalculator.Sync.Zafiro;
 
-public static class FifoDesktopSyncServiceCollectionExtensions
+public static class FifoZafiroSyncServiceCollectionExtensions
 {
-    public static IServiceCollection AddFifoDesktopSync(this IServiceCollection services)
+    public static IServiceCollection AddFifoZafiroSync(this IServiceCollection services)
     {
         services.AddSingleton<IFifoSyncIdentityProvider, ZafiroSyncFifoSyncIdentityProvider>();
         services.AddSingleton<IFifoRemoteCatalogClientFactory, ZafiroSyncFifoRemoteCatalogClientFactory>();

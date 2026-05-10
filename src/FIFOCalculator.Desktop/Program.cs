@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using FIFOCalculator.Desktop.Sync;
+using FIFOCalculator.Sync.Zafiro;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Avalonia;
 using System;
@@ -15,7 +15,7 @@ internal class Program
 
     public static AppBuilder BuildAvaloniaApp()
     {
-        App.ConfigureHostServices = services => services.AddFifoDesktopSync();
+        App.ConfigureHostServices = services => services.AddFifoZafiroSync();
 
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()

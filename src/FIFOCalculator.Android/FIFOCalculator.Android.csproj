@@ -22,7 +22,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
+		<PackageReference Include="Zafiro.Avalonia.Mcp.AppHost" Version="0.0.56" Condition="'$(Configuration)' == 'Debug'" />
+		<PackageReference Include="Zafiro.Sync.Client" Version="0.0.3" />
 		<PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.1" />	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\FIFOCalculator.ZafiroSync\*.cs" Link="Sync\%(Filename)%(Extension)" />
+	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FIFOCalculator\FIFOCalculator.csproj" />
 	</ItemGroup>

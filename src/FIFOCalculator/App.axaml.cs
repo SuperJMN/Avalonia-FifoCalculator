@@ -9,6 +9,7 @@ using FIFOCalculator.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Optris.Icons.Avalonia;
 using Optris.Icons.Avalonia.FontAwesome;
+using Optris.Icons.Avalonia.MaterialDesign;
 using Serilog;
 using Zafiro.Avalonia.Controls.Shell;
 using Zafiro.Avalonia.Dialogs;
@@ -34,6 +35,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         IconProvider.Current.Register<FontAwesomeIconProvider>();
+        IconProvider.Current.Register<MaterialDesignIconProvider>();
         IconControlProviderRegistry.Register(new OptrisIconControlProvider(), asDefault: true);
 
         var dynamicDataSink = new DynamicDataSink();
