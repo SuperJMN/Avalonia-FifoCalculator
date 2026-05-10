@@ -68,7 +68,7 @@ public partial class App : Application
                     new AvaloniaFileSystemPicker(() => TopLevel.GetTopLevel(view)!.StorageProvider));
 
                 var provider = services.BuildServiceProvider();
-                provider.GetRequiredService<IFifoSyncService>().Initialize().GetAwaiter().GetResult();
+                FifoSyncStartup.Start(provider.GetRequiredService<IFifoSyncService>(), Log.Logger);
                 System.ObservableExtensions.Subscribe(
                     provider.GetRequiredService<SettingsViewModel>().LoadSavedData.Execute(),
                     _ => { });

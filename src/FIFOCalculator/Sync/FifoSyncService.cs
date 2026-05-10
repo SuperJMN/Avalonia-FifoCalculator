@@ -28,6 +28,7 @@ public sealed class FifoSyncService : IFifoSyncService
     private readonly IFifoRemoteCatalogClientFactory remoteCatalogClientFactory;
     private readonly ILogger logger;
     private readonly BehaviorSubject<FifoSyncStatus> statusChanged;
+    private readonly SemaphoreSlim initializationGate = new(1, 1);
     private FifoSyncState state = new();
     private IFifoSyncIdentity? identity;
     private IFifoRemoteCatalogClient? remoteCatalogClient;
@@ -57,23 +58,41 @@ public sealed class FifoSyncService : IFifoSyncService
 
     public async Task<Result> Initialize(CancellationToken cancellationToken = default)
     {
-        var stateResult = await LoadState(cancellationToken);
-        if (stateResult.IsFailure)
+        if (initialized)
         {
-            return Result.Failure(stateResult.Error);
+            return Result.Success();
         }
 
-        var exists = await storage.Exists(FifoSyncDefaults.IdentityKey, cancellationToken);
-        if (exists.IsFailure)
+        await initializationGate.WaitAsync(cancellationToken);
+        try
         {
-            return Result.Failure(exists.Error);
-        }
+            if (initialized)
+            {
+                return Result.Success();
+            }
 
-        state = stateResult.Value;
-        hasStoredIdentity = exists.Value;
-        initialized = true;
-        Publish();
-        return Result.Success();
+            var stateResult = await LoadState(cancellationToken);
+            if (stateResult.IsFailure)
+            {
+                return Result.Failure(stateResult.Error);
+            }
+
+            var exists = await storage.Exists(FifoSyncDefaults.IdentityKey, cancellationToken);
+            if (exists.IsFailure)
+            {
+                return Result.Failure(exists.Error);
+            }
+
+            state = stateResult.Value;
+            hasStoredIdentity = exists.Value;
+            initialized = true;
+            Publish();
+            return Result.Success();
+        }
+        finally
+        {
+            initializationGate.Release();
+        }
     }
 
     public async Task<Result> CreateIdentity(string password, EntryCatalog localCatalog, CancellationToken cancellationToken = default)
