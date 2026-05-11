@@ -10,7 +10,7 @@
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
 		<PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1" />
-		<PackageReference Include="Zafiro.Avalonia.Mcp.AppHost" Version="0.0.56" />
+		<PackageReference Include="Zafiro.Avalonia.Mcp.AppHost" Version="0.0.57" />
 		<PackageReference Include="Zafiro.Sync.Client" Version="0.0.3" />
 	</ItemGroup>
 
